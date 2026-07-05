@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String            @id @default(cuid())
+  clerkId      String            @unique
+  email        String            @unique
+  name         String?
+  totalXp      Int               @default(0)
+  streakCount  Int               @default(0)
+  lastTaskDate DateTime?
+  createdAt    DateTime          @default(now())
+  campaigns    Campaign[]
+  pointsAwards PointsAward[]
+  achievements UserAchievement[]
+}
+
+model Campaign {
+  id                  String   @id @default(cuid())
+  title               String
+  targetDescription   String
+  totalEstimatedWeeks Int
+  circuitData         Json
+  createdAt           DateTime @default(now())
+  userId              String?
+  user                User?    @relation(fields: [userId], references: [id])
+}
+
+model PointsAward {
+  id        String   @id @default(cuid())
+  userId    String
+  points    Int
+  reason    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  achievedAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
