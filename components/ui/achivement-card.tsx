@@ -1,8 +1,10 @@
 "use client"
 
 import * as React from "react"
+import { LockOpen, Trophy } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
 import { AchievementBadge } from "@/components/ui/achievement-badge"
 import { AchievementList } from "@/components/ui/achievement-list"
 import { Button } from "@/components/ui/button"
@@ -45,6 +47,7 @@ const AchievementCard = React.forwardRef<HTMLDivElement, AchievementCardProps>(
     const unlockedCount = achievements.filter(
       (a) => a.achievedAt !== null
     ).length
+    const totalCount = achievements.length
 
     return (
       <div
@@ -56,9 +59,13 @@ const AchievementCard = React.forwardRef<HTMLDivElement, AchievementCardProps>(
           <p className="text-7xl font-bold tracking-tight sm:text-8xl">
             {unlockedCount}
           </p>
-          <p className="text-muted-foreground mt-1 text-sm font-medium">
+          <div className="mt-1 flex items-center justify-center gap-2 text-sm font-medium text-muted-foreground">
+            <LockOpen className="h-4 w-4 text-emerald-400" />
             Badges Unlocked
-          </p>
+            <Badge variant="secondary" className="ml-1">
+              {totalCount} total
+            </Badge>
+          </div>
         </div>
 
         <div className="mt-10 flex items-end justify-center gap-4">

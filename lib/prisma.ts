@@ -6,7 +6,7 @@ import ws from "ws";
 neonConfig.webSocketConstructor = ws;
 
 const prismaClientSingleton = () => {
-  const connectionString = "postgresql://neondb_owner:npg_J3YoWF1EAzdm@ep-summer-poetry-aong97qi-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
+  const connectionString = process.env.DATABASE_URL!;
 
   const adapter = new PrismaNeon({ connectionString });
   return new PrismaClient({ adapter });

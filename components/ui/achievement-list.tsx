@@ -2,9 +2,10 @@
 
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import { Trophy } from "lucide-react"
+import { Lock, LockOpen, Trophy } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
 
 interface Achievement {
   id: string
@@ -124,7 +125,10 @@ const AchievementList = React.forwardRef<HTMLDivElement, AchievementListProps>(
                     : undefined
                 }
                 className={cn(
-                  "bg-background flex items-center gap-4 rounded-2xl border px-4 py-3",
+                  "flex items-center gap-4 rounded-2xl border px-4 py-3 transition-all",
+                  isUnlocked
+                    ? "bg-card border-emerald-500/20"
+                    : "bg-muted/30 border-muted opacity-60",
                   onAchievementClick && "cursor-pointer"
                 )}
               >
@@ -146,25 +150,42 @@ const AchievementList = React.forwardRef<HTMLDivElement, AchievementListProps>(
                     aria-hidden="true"
                     className={cn(
                       badgeSizeMap[badgeSize],
-                      "flex shrink-0 items-center justify-center rounded-xl",
+                      "flex shrink-0 items-center justify-center rounded-xl transition-colors",
                       isUnlocked
-                        ? "bg-muted text-muted-foreground"
-                        : "bg-primary text-primary-foreground"
+                        ? "bg-emerald-500/10 text-emerald-400"
+                        : "bg-muted text-muted-foreground"
                     )}
                   >
-                    <Trophy className={iconSizeMap[badgeSize]} />
+                    {isUnlocked ? (
+                      <Trophy className={cn(iconSizeMap[badgeSize], "fill-emerald-400/20")} />
+                    ) : (
+                      <Lock className={iconSizeMap[badgeSize]} />
+                    )}
                   </div>
                 )}
 
                 <div className="min-w-0 flex-1">
-                  <p
-                    className={cn(
-                      "truncate text-base font-semibold",
-                      !isUnlocked && "text-muted-foreground"
-                    )}
-                  >
-                    {achievement.name}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p
+                      className={cn(
+                        "truncate text-base font-semibold",
+                        !isUnlocked && "text-muted-foreground"
+                      )}
+                    >
+                      {achievement.name}
+                    </p>
+                    <Badge
+                      variant={isUnlocked ? "success" : "secondary"}
+                      className="shrink-0"
+                    >
+                      {isUnlocked ? (
+                        <LockOpen className="h-3 w-3" />
+                      ) : (
+                        <Lock className="h-3 w-3" />
+                      )}
+                      {isUnlocked ? "Unlocked" : "Locked"}
+                    </Badge>
+                  </div>
                   <p className="text-muted-foreground truncate text-sm">
                     {achievement.description ?? "Complete the required steps"}
                   </p>
@@ -193,7 +214,7 @@ const AchievementList = React.forwardRef<HTMLDivElement, AchievementListProps>(
                         cy={progressSize / 2}
                         r={progressRadius}
                         fill="none"
-                        stroke="var(--primary)"
+                        stroke="hsl(160, 60%, 45%)"
                         strokeLinecap="round"
                         strokeWidth={progressStroke}
                         strokeDasharray={circumference}

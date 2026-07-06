@@ -11,10 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import GlobalNavbar from "@/components/global-navbar";
 import { ApiKeyDialog } from "@/components/ui/api-key-dialog";
-import { KeyRound, Lock, Settings, Sparkles, Target } from "lucide-react";
+import { WarpBackground } from "@/components/ui/warp-background";
+import GridLoader from "@/components/ui/spinner-10";
+import { KeyRound, Lock, Settings, Sparkles, Target, Zap } from "lucide-react";
 
 const EXPERIENCE_LEVEL_OPTIONS: { value: ExperienceLevel; label: string }[] = [
   { value: "BEGINNER", label: "Beginner" },
@@ -38,6 +41,7 @@ export default function CreateCampaignPage() {
   const [limitReached, setLimitReached] = useState(false);
   const [limitChecked, setLimitChecked] = useState(false);
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
+  const [isLiteMode, setIsLiteMode] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -70,9 +74,9 @@ export default function CreateCampaignPage() {
     setErrorMessage("");
 
     try {
-      const result = await generateLearningCampaign(form, apiKey, selectedModel);
+      const result = await generateLearningCampaign(form, apiKey, selectedModel, isLiteMode);
       if (result.success && result.data) {
-        const dbResult = await createDatabaseCampaign(result.data);
+        const dbResult = await createDatabaseCampaign(result.data, isLiteMode);
         if (dbResult.success && dbResult.data) {
           router.push(`/campaign/${dbResult.data.id}`);
         } else {
@@ -115,7 +119,20 @@ export default function CreateCampaignPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-slate-50 text-slate-900">
+    <>
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <WarpBackground className="size-full rounded-none border-0">
+            <div className="flex flex-col items-center gap-4">
+              <GridLoader size={56} color="white" mode="stagger" speed="normal" rounded />
+              <p className="text-sm font-medium text-slate-200">
+                Generating your todo list, please wait...
+              </p>
+            </div>
+          </WarpBackground>
+        </div>
+      )}
+      <div className="min-h-screen w-full bg-slate-50 text-slate-900">
       <GlobalNavbar />
       <div className="mx-auto max-w-2xl px-4 py-8">
         <div className="rounded-xl border-2 border-slate-200 bg-white p-6 sm:p-8">
@@ -209,6 +226,24 @@ export default function CreateCampaignPage() {
               </div>
             </div>
 
+            <div className="flex items-start gap-3 rounded-lg border-2 border-slate-200 bg-slate-50 p-4">
+              <Switch
+                id="lite-mode"
+                checked={isLiteMode}
+                onCheckedChange={setIsLiteMode}
+                className="mt-0.5"
+              />
+              <div className="space-y-0.5">
+                <Label htmlFor="lite-mode" className="text-xs font-semibold text-slate-700 cursor-pointer">
+                  <Zap className="inline h-3.5 w-3.5 mr-1 text-amber-500" />
+                  Lite Mode (Fast & Resource-Free)
+                </Label>
+                <p className="text-[11px] text-slate-500 leading-snug">
+                  Turns off AI resource gathering. Recommended to avoid API rate limits and speed up generation.
+                </p>
+              </div>
+            </div>
+
             {errorMessage && (
               <div className="rounded-lg border-2 border-red-200 bg-red-50 px-4 py-3 text-xs font-medium text-red-700">
                 {errorMessage}
@@ -221,7 +256,7 @@ export default function CreateCampaignPage() {
               className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-5 border-2 border-emerald-700 transition-all disabled:bg-slate-200 disabled:text-slate-400 disabled:border-slate-200"
             >
               {loading ? (
-                "Generating Circuit... (Researching & Curating)"
+                isLiteMode ? "Generating Circuit... (Lite Mode)" : "Generating Circuit... (Researching & Curating)"
               ) : (
                 <>
                   <Sparkles className="h-4 w-4 mr-2" />
@@ -233,6 +268,7 @@ export default function CreateCampaignPage() {
         </div>
       </div>
       <ApiKeyDialog open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog} />
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,9 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Trophy } from "lucide-react"
+import { Lock, LockOpen, Trophy } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
 
 interface Achievement {
   id: string
@@ -15,7 +16,6 @@ interface Achievement {
 }
 
 interface UserAchievement extends Achievement {
-  /** ISO date when earned, or `null` if locked */
   achievedAt: string | null
 }
 
@@ -77,7 +77,7 @@ const AchievementBadge = React.forwardRef<
     const ringDashoffset =
       ringCircumference - (progress / 100) * ringCircumference
 
-    const statusLabel = isUnlocked ? "Earned" : "Locked"
+    const statusLabel = isUnlocked ? "Unlocked" : "Locked"
     const itemLabel = `${achievement.name} - ${statusLabel}`
 
     return (
@@ -98,9 +98,11 @@ const AchievementBadge = React.forwardRef<
             : undefined
         }
         className={cn(
-          "bg-card flex flex-col items-center justify-center gap-2 rounded-lg border p-4",
+          "flex flex-col items-center justify-center gap-2 rounded-lg border p-4 transition-all",
+          isUnlocked
+            ? "bg-card border-emerald-500/30 shadow-[0_0_12px_-4px_hsl(160,60%,45%)]"
+            : "border-muted bg-muted/30 opacity-60 grayscale",
           onAchievementClick && "cursor-pointer",
-          !isUnlocked && "opacity-50",
           className
         )}
         {...props}
@@ -123,7 +125,7 @@ const AchievementBadge = React.forwardRef<
                 cy={ringSize / 2}
                 r={ringRadius}
                 fill="none"
-                stroke="var(--primary)"
+                stroke={isUnlocked ? "hsl(160, 60%, 45%)" : "var(--primary)"}
                 strokeLinecap="round"
                 strokeWidth={ringStrokeWidth}
                 strokeDasharray={ringCircumference}
@@ -140,7 +142,6 @@ const AchievementBadge = React.forwardRef<
               className={cn(
                 badgeSizeMap[badgeSize],
                 "relative z-10 rounded-full object-cover",
-                !isUnlocked && "grayscale"
               )}
             />
           ) : (
@@ -150,11 +151,15 @@ const AchievementBadge = React.forwardRef<
                 badgeSizeMap[badgeSize],
                 "relative z-10 flex items-center justify-center rounded-full",
                 isUnlocked
-                  ? "bg-muted text-muted-foreground"
-                  : "bg-primary text-primary-foreground"
+                  ? "bg-emerald-500/10 text-emerald-400"
+                  : "bg-muted text-muted-foreground"
               )}
             >
-              <Trophy className={iconSizeMap[badgeSize]} />
+              {isUnlocked ? (
+                <Trophy className={cn(iconSizeMap[badgeSize], "fill-emerald-400/20")} />
+              ) : (
+                <Lock className={iconSizeMap[badgeSize]} />
+              )}
             </div>
           )}
         </div>
@@ -173,6 +178,15 @@ const AchievementBadge = React.forwardRef<
         >
           {achievement.name}
         </span>
+
+        <Badge variant={isUnlocked ? "success" : "secondary"}>
+          {isUnlocked ? (
+            <LockOpen className="h-3 w-3" />
+          ) : (
+            <Lock className="h-3 w-3" />
+          )}
+          {statusLabel}
+        </Badge>
       </div>
     )
   }

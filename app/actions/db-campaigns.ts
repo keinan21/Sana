@@ -8,7 +8,8 @@ import type { LearningCircuit } from "@/app/actions/generator";
 import { awardTaskXp, awardVerificationXp } from "@/app/actions/gamification";
 
 export async function createDatabaseCampaign(
-  input: LearningCircuit
+  input: LearningCircuit,
+  isLiteMode?: boolean
 ): Promise<{ success: boolean; data?: { id: string; title: string }; error?: string }> {
   try {
     const { userId: clerkId } = await auth();
@@ -56,8 +57,8 @@ export async function createDatabaseCampaign(
             title: r.title,
             url: r.url,
           }))
-          // Safety net: ensure every todo has at least 1 resource
-          if (resources.length === 0) {
+          // Safety net: ensure every todo has at least 1 resource (skip in lite mode)
+          if (!isLiteMode && resources.length === 0) {
             const searchQuery = encodeURIComponent(`${t.task} tutorial`);
             resources.push({
               platform: "Google Search",

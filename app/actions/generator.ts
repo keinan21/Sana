@@ -76,6 +76,36 @@ type Modul = LearningCircuit["moduls"][number];
 type Todo = Modul["todos"][number];
 
 // ============================================================
+// 2B. LITE OUTPUT SCHEMA — no resources required
+// ============================================================
+const LiteTodoSchema = z.object({
+  id: z.string().describe("Unique todo id, e.g. t1, t2, t3"),
+  task: z.string().describe("In-depth material & concrete action the learner must complete"),
+  isDone: z.boolean().default(false),
+  resources: z.array(ResourceSchema).max(2).default([]),
+});
+
+const LiteModulSchema = z.object({
+  id: z.string().describe("Unique modul id, e.g. m1, m2, m3"),
+  title: z.string().describe("Title of the learning modul"),
+  idealDaysToComplete: z
+    .number()
+    .describe(
+      "Ideal number of days to complete this modul, calculated based on weeklyHoursCommitment & experienceLevel"
+    ),
+  done: z.boolean().default(false),
+  todos: z.array(LiteTodoSchema),
+});
+
+const LiteLearningCircuitSchema = z.object({
+  title: z.string().describe("Name of the learning circuit"),
+  targetDescription: z.string().describe("Objective description based on the user's expectations & experience level"),
+  totalEstimatedWeeks: z.number().describe("Total ideal number of weeks to complete this circuit"),
+  createdAt: z.string().default(() => new Date().toISOString()),
+  moduls: z.array(LiteModulSchema),
+});
+
+// ============================================================
 // 3. PROOF OF WORK VERIFICATION SCHEMA (Strict Code Reviewer)
 // ============================================================
 const VerificationResultSchema = z.object({
@@ -241,6 +271,46 @@ async function runCuratorAgent(
 }
 
 // ============================================================
+// STEP 2B — LITE CURATOR AGENT (no research, no resources)
+// ============================================================
+async function runLiteCuratorAgent(
+  input: LearningCircuitInput,
+  gemini: Gemini
+): Promise<LearningCircuit> {
+  const curatorAgent = new LlmAgent({
+    name: 'lite_curator_agent',
+    model: gemini,
+    instruction:
+      'You curator. Output JSON matching schema.\n' +
+      `Level: ${input.experienceLevel}. Hours/week: ${input.weeklyHoursCommitment}. Expectation: "${input.expectations}".\n` +
+      'Rules:\n' +
+      '1. Last modul MUST be publication (github/blog/social).\n' +
+      '2. idealDaysToComplete: low level or low hours = more days. Calculate rationally.\n' +
+      '3. Do NOT include any resources/links. Leave resources array empty.\n' +
+      '4. Use your own knowledge. NO making things up.\n',
+    outputSchema: LiteLearningCircuitSchema,
+  });
+
+  const curationQuery = `Build a Learning Circuit for: "${input.userGoal}".`;
+
+  const finalText = await runAgentAndGetFinalText(curatorAgent, 'lite_curator_app', curationQuery);
+
+  if (!finalText) {
+    throw new Error('Lite curator agent did not produce a final text response.');
+  }
+
+  const cleanJson = sanitizeJsonBlock(finalText);
+  const parsedJson: unknown = JSON.parse(cleanJson);
+
+  const validated = LiteLearningCircuitSchema.safeParse(parsedJson);
+  if (!validated.success) {
+    throw new Error(`JSON output does not match schema: ${validated.error.message}`);
+  }
+
+  return validated.data as unknown as LearningCircuit;
+}
+
+// ============================================================
 // STEP 3 — LINK VERIFIER & REPAIR LOOP
 // Not pure LLM: every url inside "resources" is checked with a real HTTP
 // request. If it's dead, a small agent (link_finder_agent) tries to find
@@ -353,7 +423,8 @@ async function verifyAndRepairResources(circuit: LearningCircuit, gemini: Gemini
 export async function generateLearningCampaign(
   input: LearningCircuitInput,
   apiKey: string,
-  model: string = 'gemini-3.5-flash'
+  model: string = 'gemini-3.5-flash',
+  isLiteMode: boolean = false
 ): Promise<{ success: boolean; data?: LearningCircuit; error?: string }> {
   const parsedInput = LearningCircuitInputSchema.safeParse(input);
   if (!parsedInput.success) {
@@ -361,13 +432,19 @@ export async function generateLearningCampaign(
   }
 
   const validInput = parsedInput.data;
-  let researchText = '';
 
   try {
     const gemini = new Gemini({ model, apiKey });
 
+    if (isLiteMode) {
+      // LITE PATH: skip research & link verification, use Lite schema
+      const circuit = await runLiteCuratorAgent(validInput, gemini);
+      return { success: true, data: circuit };
+    }
+
+    // FULL PATH: research -> curation -> link verification
     // STEP 1: Internet research via Google Search tool
-    researchText = await runResearchAgent(validInput, gemini);
+    const researchText = await runResearchAgent(validInput, gemini);
 
     // STEP 2: Curate research results into a Learning Circuit JSON
     const circuit = await runCuratorAgent(validInput, researchText, gemini);
@@ -379,7 +456,6 @@ export async function generateLearningCampaign(
   } catch (error) {
     console.error("--- ADK PIPELINE ERROR REPORT ---");
     console.error("Error message:", error instanceof Error ? error.message : String(error));
-    console.error("Research result (raw text):", researchText || '(research not completed / failed)');
     console.error("----------------------------------");
 
     return {
