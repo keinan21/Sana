@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Lock, LockOpen, Trophy } from "lucide-react"
 
@@ -133,9 +134,12 @@ const AchievementList = React.forwardRef<HTMLDivElement, AchievementListProps>(
                 )}
               >
                 {achievement.badgeUrl ? (
-                  <img
+                  <Image
                     src={achievement.badgeUrl}
                     alt={achievement.name}
+                    unoptimized
+                    width={48}
+                    height={48}
                     className={cn(
                       badgeSizeMap[badgeSize],
                       "shrink-0 rounded-xl object-cover",

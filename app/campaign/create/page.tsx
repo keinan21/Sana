@@ -1,12 +1,11 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { generateLearningCampaign, type LearningCircuitInput, type ExperienceLevel } from "@/app/actions/generator";
 import { createDatabaseCampaign } from "@/app/actions/db-campaigns";
-import { checkCampaignLimit } from "@/app/actions/gamification";
 import { getApiKey, getSelectedModel } from "@/components/ui/api-key-dialog";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,9 +14,9 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import GlobalNavbar from "@/components/global-navbar";
 import { ApiKeyDialog } from "@/components/ui/api-key-dialog";
-import { WarpBackground } from "@/components/ui/warp-background";
-import GridLoader from "@/components/ui/spinner-10";
-import { KeyRound, Lock, Settings, Sparkles, Target, Zap } from "lucide-react";
+import { Settings, Sparkles, Target, Zap } from "lucide-react";
+
+const GridLoader = dynamic(() => import("@/components/ui/spinner-10"), { ssr: false });
 
 const EXPERIENCE_LEVEL_OPTIONS: { value: ExperienceLevel; label: string }[] = [
   { value: "BEGINNER", label: "Beginner" },
@@ -38,19 +37,11 @@ export default function CreateCampaignPage() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [mounted, setMounted] = useState(false);
-  const [limitReached, setLimitReached] = useState(false);
-  const [limitChecked, setLimitChecked] = useState(false);
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const [isLiteMode, setIsLiteMode] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    checkCampaignLimit().then((res) => {
-      if (!res.success || !res.withinLimit) {
-        setLimitReached(true);
-      }
-      setLimitChecked(true);
-    });
   }, []);
 
   const updateForm = <K extends keyof LearningCircuitInput>(key: K, value: LearningCircuitInput[K]) => {
@@ -73,11 +64,14 @@ export default function CreateCampaignPage() {
     setLoading(true);
     setErrorMessage("");
 
+    let navigated = false;
+
     try {
       const result = await generateLearningCampaign(form, apiKey, selectedModel, isLiteMode);
       if (result.success && result.data) {
         const dbResult = await createDatabaseCampaign(result.data, isLiteMode);
         if (dbResult.success && dbResult.data) {
+          navigated = true;
           router.push(`/campaign/${dbResult.data.id}`);
         } else {
           setErrorMessage(dbResult.error || "Failed to save campaign.");
@@ -88,48 +82,22 @@ export default function CreateCampaignPage() {
     } catch {
       setErrorMessage("Failed to generate campaign. Please try again.");
     } finally {
-      setLoading(false);
+      if (!navigated) setLoading(false);
     }
   };
 
-  if (!mounted || !limitChecked) return null;
-
-  if (limitReached) {
-    return (
-      <div className="min-h-screen w-full bg-slate-50 text-slate-900">
-        <GlobalNavbar />
-        <div className="mx-auto max-w-lg px-4 py-16 text-center">
-          <div className="rounded-xl border-2 border-slate-200 bg-white p-8">
-            <div className="flex justify-center mb-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
-                <Lock className="h-7 w-7 text-amber-700" />
-              </div>
-            </div>
-            <h1 className="text-xl font-bold text-slate-900 mb-2">Free Limit Reached</h1>
-            <p className="text-sm text-slate-500 mb-2">
-              You have reached the maximum of 5 free campaigns.
-            </p>
-            <p className="text-sm text-slate-500">
-              Stay tuned — we're working on something exciting! More campaigns coming soon.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (!mounted) return null;
 
   return (
     <>
       {loading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <WarpBackground className="size-full rounded-none border-0">
-            <div className="flex flex-col items-center gap-4">
-              <GridLoader size={56} color="white" mode="stagger" speed="normal" rounded />
-              <p className="text-sm font-medium text-slate-200">
-                Generating your todo list, please wait...
-              </p>
-            </div>
-          </WarpBackground>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+          <div className="flex flex-col items-center gap-4">
+            <GridLoader size={56} color="#10b981" mode="stagger" speed="normal" rounded />
+            <p className="text-sm font-medium text-slate-700">
+              Generating your todo list, please wait...
+            </p>
+          </div>
         </div>
       )}
       <div className="min-h-screen w-full bg-slate-50 text-slate-900">

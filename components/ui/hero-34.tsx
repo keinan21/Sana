@@ -1,12 +1,13 @@
-import { motion, type Variants } from "framer-motion";
-import { 
-  ArrowRight, 
-  Play, 
-  MessageSquareMore, 
-  Globe, 
+import Image from "next/image";
+import { motion, type Variants } from "motion/react";
+import {
+  ArrowRight,
+  Play,
+  MessageSquareMore,
+  Globe,
   ChevronDown,
   ArrowDown,
-  Leaf
+  Leaf,
 } from "lucide-react";
 
 const LogoIcon = Leaf;
@@ -81,10 +82,13 @@ export default function Hero34() {
   return (
     <div className="relative min-h-screen w-full overflow-hidden font-sans antialiased selection:bg-green-200 selection:text-green-900">
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        <img
+        <Image
           src="https://assets.watermelon.sh/hero-34-bg.avif"
           alt="Nature landscape"
-          className="h-full w-full object-cover"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
         />
       </div>
 
@@ -154,12 +158,14 @@ export default function Hero34() {
                 ].map((src, i) => (
                   <div
                     key={i}
-                    className="h-8 w-8 overflow-hidden rounded-full border-2 border-[#FAF9F5] shadow-sm ring-1 ring-black/10"
+                    className="relative h-8 w-8 overflow-hidden rounded-full border-2 border-[#FAF9F5] shadow-sm ring-1 ring-black/10"
                   >
-                    <img
+                    <Image
                       src={src}
                       alt={`Customer ${i + 1}`}
-                      className="h-full w-full object-cover"
+                      fill
+                      sizes="32px"
+                      className="object-cover"
                     />
                   </div>
                 ))}

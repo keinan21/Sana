@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Show, SignInButton, SignUpButton, UserButton, useAuth } from '@clerk/nextjs';
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion, type Variants } from 'motion/react';
@@ -104,8 +105,14 @@ export default function Hero10({
 
   return (
     <section className="relative isolate min-h-screen w-full bg-white font-sans text-slate-900 antialiased overflow-hidden">
-      <div
-        className="absolute inset-0 bg-[url('/hero-bg.avif')] bg-cover bg-center opacity-90"
+      <Image
+        src="/hero-bg.avif"
+        alt=""
+        fill
+        priority
+        unoptimized
+        sizes="100vw"
+        className="absolute inset-0 object-cover opacity-90"
         aria-hidden="true"
       />
       <div
@@ -124,7 +131,7 @@ export default function Hero10({
             href="#"
             className="inline-flex min-h-10 items-center transition-[opacity,transform] duration-200 ease-out hover:opacity-75 active:scale-[0.96]"
           >
-            <img src="/logo_icon.png" alt={brandName} className="h-8 w-auto" />
+            <Image src="/assets/logo/logo.svg" alt={brandName} width={32} height={32} className="h-8 w-auto" />
           </a>
 
           <nav className="hidden items-center gap-[54px] lg:flex">
@@ -184,7 +191,7 @@ export default function Hero10({
                   href="#"
                   className="inline-flex items-center"
                 >
-                  <img src="/logo_icon.png" alt={brandName} className="h-7 w-auto" />
+                  <Image src="/assets/logo/logo.svg" alt={brandName} width={28} height={28} className="h-7 w-auto" />
                 </a>
                 <button
                   type="button"

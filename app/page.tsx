@@ -6,7 +6,7 @@ import Hero from "@/components/hero-10";
 
 export default function Home() {
   return (
-    <>
+    <main>
       <Hero
         brandName="sana"
         eyebrowText="AI-Powered Goal Breaker"
@@ -18,6 +18,6 @@ export default function Home() {
       />
       <Features1 />
       <CTASection />
-    </>
+    </main>
   );
 }

@@ -32,11 +32,6 @@ export async function createDatabaseCampaign(
       });
     }
 
-    const campaignCount = await prisma.campaign.count({ where: { userId: user.id } });
-    if (campaignCount >= 5) {
-      return { success: false, error: "You have reached the maximum limit of 5 free campaigns. Stay tuned — more campaigns coming soon!" };
-    }
-
     const circuitData: LearningCircuitData = {
       id: input.title
         .toLowerCase()

@@ -49,6 +49,7 @@ export default function CampaignsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    document.title = "My Campaigns | Sana"
     getUserCampaigns().then((res) => {
       if (res.success && res.data) {
         setCampaigns(res.data)
@@ -66,7 +67,7 @@ export default function CampaignsPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-slate-50 text-slate-900">
+    <main className="min-h-screen w-full bg-slate-50 text-slate-900">
       <GlobalNavbar />
       <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
@@ -146,6 +147,6 @@ export default function CampaignsPage() {
           </div>
         )}
       </div>
-    </div>
+    </main>
   )
 }

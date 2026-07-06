@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import { Lock, LockOpen, Trophy } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -136,9 +137,12 @@ const AchievementBadge = React.forwardRef<
           ) : null}
 
           {achievement.badgeUrl ? (
-            <img
+            <Image
               src={achievement.badgeUrl}
               alt={`${achievement.name} badge - ${statusLabel}`}
+              unoptimized
+              width={64}
+              height={64}
               className={cn(
                 badgeSizeMap[badgeSize],
                 "relative z-10 rounded-full object-cover",

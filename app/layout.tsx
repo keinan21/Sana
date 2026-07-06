@@ -18,9 +18,34 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sana — AI-Powered Goal Breaker",
+  title: {
+    default: "Sana — AI-Powered Goal Breaker",
+    template: "%s | Sana",
+  },
   description:
     "Sana turns massive life goals into bite-sized weekly quests. Track XP, conquer Kanban boards, and verify progress with AI — all in one place.",
+  openGraph: {
+    title: "Sana — AI-Powered Goal Breaker",
+    description:
+      "Sana turns massive life goals into bite-sized weekly quests. Track XP, conquer Kanban boards, and verify progress with AI — all in one place.",
+    url: "https://sana.ai",
+    siteName: "Sana",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sana — AI-Powered Goal Breaker",
+    description:
+      "Sana turns massive life goals into bite-sized weekly quests. Track XP, conquer Kanban boards, and verify progress with AI — all in one place.",
+  },
+  robots: { index: true, follow: true },
+  icons: {
+    icon: [
+      { url: "/assets/logo/logo.svg", type: "image/svg+xml" },
+    ],
+    apple: { url: "/assets/logo/logo.svg", type: "image/svg+xml" },
+  },
 };
 
 export default function RootLayout({

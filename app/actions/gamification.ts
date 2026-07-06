@@ -97,22 +97,6 @@ export async function getDashboardData() {
   }
 }
 
-export async function checkCampaignLimit() {
-  try {
-    const { userId: clerkId } = await auth()
-    if (!clerkId) return { success: false, error: "Not authenticated" } as const
-
-    const user = await prisma.user.findUnique({ where: { clerkId } })
-    if (!user) return { success: true, withinLimit: false, count: 0 } as const
-
-    const count = await prisma.campaign.count({ where: { userId: user.id } })
-    return { success: true, withinLimit: count < 5, count } as const
-  } catch (error) {
-    console.error("checkCampaignLimit error:", error)
-    return { success: false, error: "Failed to check limit" } as const
-  }
-}
-
 export async function awardTaskXp(campaignId: string, questId: string, taskId: string) {
   try {
     const { userId: clerkId } = await auth()

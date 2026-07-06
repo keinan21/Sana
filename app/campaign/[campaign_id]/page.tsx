@@ -107,6 +107,7 @@ export default function CampaignDetailPage() {
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
 
   useEffect(() => {
+    document.title = "Campaign | Sana"
     const fetchCampaign = async () => {
       if (!campaignId) return;
       setLoading(true);

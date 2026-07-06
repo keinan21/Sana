@@ -1,12 +1,12 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { getDashboardData } from "@/app/actions/gamification"
 import { getUserCampaigns } from "@/app/actions/db-campaigns"
 import { PointsBadge } from "@/components/ui/points-badge"
-import { PointsChart } from "@/components/ui/points-chart"
 import { PointsAwards } from "@/components/ui/points-awards"
 import { AchievementBadge } from "@/components/ui/achievement-badge"
 import { Progress } from "@/components/ui/progress"
@@ -26,6 +26,11 @@ import {
   Target,
 } from "lucide-react"
 import type { LearningCircuitData } from "@/lib/types"
+
+const PointsChart = dynamic(() => import("@/components/ui/points-chart").then((m) => m.PointsChart), {
+  ssr: false,
+  loading: () => <div className="h-[260px] animate-pulse rounded-xl bg-slate-100" />,
+})
 
 interface DashboardCampaign {
   id: string
@@ -98,6 +103,7 @@ export default function DashboardPage() {
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false)
 
   useEffect(() => {
+    document.title = "Dashboard | Sana"
     Promise.all([getDashboardData(), getUserCampaigns()]).then(([dashRes, campRes]) => {
       if (dashRes.success && dashRes.data) {
         setData(dashRes.data)
@@ -187,87 +193,89 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-slate-50 text-slate-900">
+    <main className="min-h-screen w-full bg-slate-50 text-slate-900 overflow-x-hidden">
       <GlobalNavbar />
 
       <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* HEADER */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-            <p className="text-sm text-slate-500 mt-1">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 truncate">Dashboard</h1>
+            <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">
               Your learning journey at a glance.
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <Button
               variant="outline"
               onClick={() => setShowApiKeyDialog(true)}
-              className="border-2 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs px-3 py-2"
+              className="border-2 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs px-2.5 sm:px-3 py-1.5 sm:py-2"
             >
-              <KeyRound className="h-3.5 w-3.5 mr-1.5" />
-              API Key
+              <KeyRound className="h-3.5 w-3.5 mr-1" />
+              <span className="hidden sm:inline">API Key</span>
+              <span className="sm:hidden">Key</span>
             </Button>
             <Button
               onClick={() => router.push("/campaign/create")}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-4 py-2 border-2 border-emerald-700"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-3 sm:px-4 py-1.5 sm:py-2 border-2 border-emerald-700"
             >
-              <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-              New Campaign
+              <Sparkles className="h-3.5 w-3.5 mr-1" />
+              <span className="hidden sm:inline">New Campaign</span>
+              <span className="sm:hidden">New</span>
             </Button>
           </div>
         </div>
 
         {/* STATS ROW */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="rounded-xl border-2 border-slate-200 bg-white p-5 flex items-center gap-4">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-amber-100">
-              <Zap className="h-5 w-5 text-amber-700" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
+          <div className="rounded-xl border-2 border-slate-200 bg-white p-3 sm:p-5 flex items-center gap-3 sm:gap-4 min-w-0">
+            <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-lg bg-amber-100">
+              <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-amber-700" />
             </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Level</p>
-              <p className="text-2xl font-bold text-slate-900">{data?.level ?? "—"}</p>
-            </div>
-          </div>
-
-          <div className="rounded-xl border-2 border-slate-200 bg-white p-5 flex items-center gap-4">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-100">
-              <Trophy className="h-5 w-5 text-emerald-700" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Total XP</p>
-              <p className="text-2xl font-bold text-slate-900">{data?.totalXp ?? "—"}</p>
+            <div className="min-w-0">
+              <p className="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider">Level</p>
+              <p className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 truncate">{data?.level ?? "—"}</p>
             </div>
           </div>
 
-          <div className="rounded-xl border-2 border-slate-200 bg-white p-5 flex items-center gap-4">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-orange-100">
-              <Flame className="h-5 w-5 text-orange-700" />
+          <div className="rounded-xl border-2 border-slate-200 bg-white p-3 sm:p-5 flex items-center gap-3 sm:gap-4 min-w-0">
+            <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-100">
+              <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-700" />
             </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Streak</p>
-              <p className="text-2xl font-bold text-slate-900">{data?.streakCount ?? 0} days</p>
+            <div className="min-w-0">
+              <p className="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider">Total XP</p>
+              <p className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 truncate">{data?.totalXp ?? "—"}</p>
             </div>
           </div>
 
-          <div className="rounded-xl border-2 border-slate-200 bg-white p-5 flex items-center gap-4">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-sky-100">
-              <Target className="h-5 w-5 text-sky-700" />
+          <div className="rounded-xl border-2 border-slate-200 bg-white p-3 sm:p-5 flex items-center gap-3 sm:gap-4 min-w-0">
+            <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-lg bg-orange-100">
+              <Flame className="h-4 w-4 sm:h-5 sm:w-5 text-orange-700" />
             </div>
-            <div>
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Completed</p>
-              <p className="text-2xl font-bold text-slate-900">{completedCampaigns}/{campaigns.length}</p>
+            <div className="min-w-0">
+              <p className="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider">Streak</p>
+              <p className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 truncate">{data?.streakCount ?? 0} days</p>
+            </div>
+          </div>
+
+          <div className="rounded-xl border-2 border-slate-200 bg-white p-3 sm:p-5 flex items-center gap-3 sm:gap-4 min-w-0">
+            <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-lg bg-sky-100">
+              <Target className="h-4 w-4 sm:h-5 sm:w-5 text-sky-700" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider">Completed</p>
+              <p className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 truncate">{completedCampaigns}/{campaigns.length}</p>
             </div>
           </div>
         </div>
 
         {/* XP PROGRESS */}
-        <div className="rounded-xl border-2 border-slate-200 bg-white p-5 mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-semibold text-slate-900">
+        <div className="rounded-xl border-2 border-slate-200 bg-white p-4 sm:p-5 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-0 mb-3">
+            <p className="text-xs sm:text-sm font-semibold text-slate-900 truncate">
               XP Progress — Level {data?.level ?? 1}
             </p>
-            <p className="text-xs font-mono text-slate-500">
+            <p className="text-[11px] sm:text-xs font-mono text-slate-500 whitespace-nowrap">
               {data?.xpToNext ?? 0} XP to next level
             </p>
           </div>
@@ -320,7 +328,7 @@ export default function DashboardPage() {
                   const progress = calcCampaignProgress(c.circuitData)
                   return (
                     <Link key={c.id} href={`/campaign/${c.id}`}>
-                      <div className="rounded-xl border-2 border-slate-200 bg-white p-5 hover:border-slate-300 transition-colors cursor-pointer h-full flex flex-col">
+                      <div className="rounded-xl border-2 border-slate-200 bg-white p-4 sm:p-5 hover:border-slate-300 transition-colors cursor-pointer h-full flex flex-col">
                         <div className="flex items-start justify-between gap-3 mb-2">
                           <h3 className="font-semibold text-slate-900 text-sm leading-snug line-clamp-2">
                             {c.title}
@@ -358,7 +366,7 @@ export default function DashboardPage() {
           {/* SIDEBAR */}
           <div className="space-y-6">
             {/* QUICK STATS */}
-            <div className="rounded-xl border-2 border-slate-200 bg-white p-5 space-y-4">
+            <div className="rounded-xl border-2 border-slate-200 bg-white p-4 sm:p-5 space-y-4">
               <h3 className="text-sm font-semibold text-slate-900">Progress Summary</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-xs">
@@ -383,7 +391,7 @@ export default function DashboardPage() {
             </div>
 
             {/* ACHIEVEMENTS */}
-            <div className="rounded-xl border-2 border-slate-200 bg-white p-5 space-y-4">
+            <div className="rounded-xl border-2 border-slate-200 bg-white p-4 sm:p-5 space-y-4">
               <h3 className="text-sm font-semibold text-slate-900">Achievements</h3>
               <div className="flex flex-wrap gap-2">
                 {data?.achievements && data.achievements.length > 0 ? (
@@ -398,7 +406,7 @@ export default function DashboardPage() {
 
             {/* POINTS CHART */}
             {data?.chartData && data.chartData.length > 0 && (
-              <div className="rounded-xl border-2 border-slate-200 bg-white p-5 space-y-4">
+              <div className="rounded-xl border-2 border-slate-200 bg-white p-4 sm:p-5 space-y-4">
                 <h3 className="text-sm font-semibold text-slate-900">Points This Week</h3>
                 <PointsChart
                   data={data.chartData}
@@ -409,7 +417,7 @@ export default function DashboardPage() {
 
             {/* RECENT AWARDS */}
             {data?.recentAwards && data.recentAwards.length > 0 && (
-              <div className="rounded-xl border-2 border-slate-200 bg-white p-5 space-y-4">
+              <div className="rounded-xl border-2 border-slate-200 bg-white p-4 sm:p-5 space-y-4">
                 <h3 className="text-sm font-semibold text-slate-900">Recent Awards</h3>
                 <PointsAwards
                   awards={data.recentAwards}
@@ -422,6 +430,6 @@ export default function DashboardPage() {
 
         <ApiKeyDialog open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog} />
       </div>
-    </div>
+    </main>
   )
 }
