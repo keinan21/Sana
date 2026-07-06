@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
-import { verifyModulProgress } from "@/app/actions/generator";
+import { verifyModulProgress, verifyIdeation } from "@/app/actions/generator";
 import {
   getDatabaseCampaignById,
   updateDatabaseCampaignProgress,
@@ -13,16 +13,12 @@ import {
 import type { LearningCircuitData, Modul, Quest } from "@/lib/types";
 import { getApiKey, getSelectedModel } from "@/components/ui/api-key-dialog";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { CheckCircle, XCircle, Sparkles, Lock, ChevronDown, ChevronRight, ClipboardList, ExternalLink, Loader2 } from "lucide-react";
+import { CheckCircle, XCircle, Sparkles, Lock, ChevronDown, ChevronRight, ClipboardList, ExternalLink } from "lucide-react";
 import { XpToast } from "@/components/ui/xp-toast";
 import { ApiKeyDialog } from "@/components/ui/api-key-dialog";
+import { QuestVerificationDialog } from "@/components/quest-verification/QuestVerificationDialog";
 import GlobalNavbar from "@/components/global-navbar";
 
 function modulToQuest(m: Modul): Quest {
@@ -39,6 +35,10 @@ function modulToQuest(m: Modul): Quest {
     tasks: m.todos.map((t) => ({ id: t.id, text: t.task, isCompleted: t.isDone })),
     isVerified: m.done,
     learningLinks,
+    type: m.type || 'project',
+    quizData: m.quizData,
+    minReflectionLength: m.minReflectionLength,
+    proofInstructions: m.proofInstructions,
   };
 }
 
@@ -98,10 +98,6 @@ export default function CampaignDetailPage() {
   const [error, setError] = useState("");
 
   const [verifyingQuest, setVerifyingQuest] = useState<Quest | null>(null);
-  const [proofType, setProofType] = useState<string>("github_repo");
-  const [proofContent, setProofContent] = useState("");
-  const [verifying, setVerifying] = useState(false);
-  const [feedback, setFeedback] = useState<{ isVerified: boolean; feedback: string; confidenceScore: number } | null>(null);
   const [questFeedback, setQuestFeedback] = useState<Record<string, { feedback: string; confidenceScore: number }>>({});
   const [xpToast, setXpToast] = useState<number | null>(null);
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
@@ -172,85 +168,83 @@ export default function CampaignDetailPage() {
 
   const openVerification = (quest: Quest) => {
     setVerifyingQuest(quest);
-    setProofType("github_repo");
-    setProofContent("");
-    setFeedback(null);
   };
 
-  const resetVerification = () => {
+  const handleQuestVerified = async (quest: Quest) => {
+    const nextQuests = quests.map((q) =>
+      q.id === quest.id ? { ...q, isVerified: true } : q
+    );
+    setQuests(nextQuests);
+    setQuestFeedback((prev) => {
+      const next = { ...prev };
+      delete next[quest.id];
+      return next;
+    });
+    if (campaignData) {
+      const updatedModuls = mergeQuestStateToModuls(nextQuests, campaignData.moduls);
+      setCampaignData({ ...campaignData, moduls: updatedModuls });
+    }
     setVerifyingQuest(null);
-    setProofType("github_repo");
-    setProofContent("");
-    setFeedback(null);
+    const dbResult = await setQuestVerified(campaignId, quest.id);
+    if (dbResult.xpAwarded) setXpToast(dbResult.xpAwarded);
   };
 
-  const handleVerifyAnswer = async () => {
-    if (!verifyingQuest || !proofContent.trim()) return;
-
+  const handleVerifyProject = async (quest: Quest, url: string) => {
     const apiKey = getApiKey()
     if (!apiKey) {
-      setVerifyingQuest(null)
       setShowApiKeyDialog(true)
-      return
+      return { success: false, error: "API key required" }
     }
-
     const selectedModel = getSelectedModel()
-    setVerifying(true);
-    setFeedback(null);
-
-    const modul = campaignData?.moduls.find((m) => m.id === verifyingQuest.id);
+    const modul = campaignData?.moduls.find((m) => m.id === quest.id);
     const tasks = modul?.todos.map((t) => t.task) || [];
-
-    const result = await verifyModulProgress(
-      verifyingQuest.title,
-      proofType,
-      proofContent,
+    return verifyModulProgress(
+      quest.title,
+      'live_app',
+      url,
       campaignData?.targetDescription || '',
       tasks,
       apiKey,
       selectedModel
     );
+  };
 
-    if (result.success && result.isVerified) {
-      setFeedback({
-        isVerified: true,
-        feedback: result.feedback || 'Proof accepted.',
-        confidenceScore: result.confidenceScore || 100,
-      });
-      setQuestFeedback((prev) => {
-        const next = { ...prev };
-        delete next[verifyingQuest.id];
-        return next;
-      });
-      const nextQuests = quests.map((q) =>
-        q.id === verifyingQuest.id ? { ...q, isVerified: true } : q
-      );
-      setQuests(nextQuests);
-      const updatedModuls = mergeQuestStateToModuls(nextQuests, campaignData!.moduls);
-      setCampaignData((prev) => (prev ? { ...prev, moduls: updatedModuls } : prev));
-      const dbResult = await setQuestVerified(campaignId, verifyingQuest.id);
-      if (dbResult.xpAwarded) setXpToast(dbResult.xpAwarded);
-    } else if (result.success && !result.isVerified) {
-      setFeedback({
-        isVerified: false,
-        feedback: result.feedback || 'Proof rejected.',
-        confidenceScore: result.confidenceScore || 0,
-      });
-      setQuestFeedback((prev) => ({
-        ...prev,
-        [verifyingQuest.id]: {
-          feedback: result.feedback || 'Proof rejected.',
-          confidenceScore: result.confidenceScore || 0,
-        },
-      }));
-    } else {
-      setFeedback({
-        isVerified: false,
-        feedback: result.error || 'Failed to verify proof.',
-        confidenceScore: 0,
-      });
+  const handleVerifyIdeation = async (quest: Quest, ideaText: string) => {
+    const apiKey = getApiKey()
+    if (!apiKey) {
+      setShowApiKeyDialog(true)
+      return { success: false, error: "API key required" }
     }
-    setVerifying(false);
+    const selectedModel = getSelectedModel()
+    const modul = campaignData?.moduls.find((m) => m.id === quest.id);
+    const tasks = modul?.todos.map((t) => t.task) || [];
+    return verifyIdeation(
+      quest.title,
+      ideaText,
+      campaignData?.targetDescription || '',
+      tasks,
+      apiKey,
+      selectedModel
+    );
+  };
+
+  const handleVerifyProjectDescription = async (quest: Quest, label: string, description: string) => {
+    const apiKey = getApiKey()
+    if (!apiKey) {
+      setShowApiKeyDialog(true)
+      return { success: false, error: "API key required" }
+    }
+    const selectedModel = getSelectedModel()
+    const modul = campaignData?.moduls.find((m) => m.id === quest.id);
+    const tasks = modul?.todos.map((t) => t.task) || [];
+    return verifyIdeation(
+      quest.title,
+      `[${label}]\n\n${description}`,
+      campaignData?.targetDescription || '',
+      tasks,
+      apiKey,
+      selectedModel
+    );
   };
 
   if (loading) {
@@ -345,109 +339,15 @@ export default function CampaignDetailPage() {
         })}
       </div>
 
-      {/* PROOF OF WORK VERIFICATION DIALOG */}
-      <Dialog
+      <QuestVerificationDialog
+        quest={verifyingQuest}
         open={verifyingQuest !== null}
-        onOpenChange={(open) => {
-          if (!open) resetVerification();
-        }}
-      >
-        <DialogContent className="bg-white border-2 border-slate-200 text-slate-900 max-w-xl w-full p-6 rounded-xl">
-          <DialogHeader>
-            <DialogTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-emerald-600" />
-              Submit Quest Proof of Work
-            </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
-              Provide tangible evidence of your work for &quot;{verifyingQuest?.title}&quot;
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 pt-2">
-            {/* Proof Type Selector */}
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold text-slate-700">Proof Type</Label>
-              <Select value={proofType} onValueChange={setProofType}>
-                <SelectTrigger className="w-full border-2 border-slate-200 bg-white text-slate-900 text-xs rounded-xl">
-                  <SelectValue placeholder="Select proof type" />
-                </SelectTrigger>
-                <SelectContent className="bg-white border-2 border-slate-200 rounded-xl">
-                  <SelectItem value="github_repo" className="text-xs">GitHub Repository URL</SelectItem>
-                  <SelectItem value="live_app" className="text-xs">Live App / Production Link</SelectItem>
-                  <SelectItem value="technical_snippet" className="text-xs">Technical Snippet (Console Logs / Code Blocks)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Dynamic Input Field */}
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold text-slate-700">
-                {proofType === 'technical_snippet' ? 'Paste your code or execution logs' : 'Paste your URL'}
-              </Label>
-              {proofType === 'technical_snippet' ? (
-                <Textarea
-                  value={proofContent}
-                  onChange={(e) => setProofContent(e.target.value)}
-                  placeholder="Paste terminal logs, code blocks, or execution output here..."
-                  className="w-full h-28 p-3 border-2 border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus-visible:border-emerald-400 focus-visible:ring-emerald-400/20 text-xs resize-none rounded-xl"
-                />
-              ) : (
-                <Input
-                  value={proofContent}
-                  onChange={(e) => setProofContent(e.target.value)}
-                  placeholder={proofType === 'github_repo' ? 'https://github.com/username/repo' : 'https://your-app.vercel.app'}
-                  className="w-full p-3 border-2 border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus-visible:border-emerald-400 focus-visible:ring-emerald-400/20 text-xs rounded-xl"
-                />
-              )}
-            </div>
-
-            {/* Submit Button */}
-            <div className="flex justify-end">
-              <Button
-                onClick={handleVerifyAnswer}
-                disabled={verifying || !proofContent.trim()}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2 border-2 border-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:border-slate-200"
-              >
-                {verifying ? (
-                  <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> Verifying...</>
-                ) : (
-                  'Submit Proof for AI Audit'
-                )}
-              </Button>
-            </div>
-
-            {/* AI Feedback Result */}
-            {feedback && (
-              <div className={`p-4 rounded-xl border-2 text-xs space-y-2 ${
-                feedback.isVerified
-                  ? 'bg-emerald-50 border-emerald-200'
-                  : 'bg-red-50 border-red-200'
-              }`}>
-                <div className="flex items-center gap-2">
-                  {feedback.isVerified ? (
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
-                  ) : (
-                    <XCircle className="w-4 h-4 text-red-600" />
-                  )}
-                  <span className={`font-semibold ${feedback.isVerified ? 'text-emerald-700' : 'text-red-700'}`}>
-                    {feedback.isVerified ? 'Proof Verified' : 'Proof Rejected'}
-                  </span>
-                  <span className={`ml-auto text-xs font-mono px-2 py-0.5 rounded ${
-                    feedback.isVerified
-                      ? 'bg-emerald-100 text-emerald-600'
-                      : 'bg-red-100 text-red-600'
-                  }`}>
-                    {feedback.confidenceScore}% confidence
-                  </span>
-                </div>
-                <p className={`leading-relaxed ${feedback.isVerified ? 'text-emerald-600' : 'text-red-600'}`}>
-                  {feedback.feedback}
-                </p>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+        onOpenChange={(open) => { if (!open) setVerifyingQuest(null); }}
+        onVerifyIdeation={handleVerifyIdeation}
+        onVerifyProject={handleVerifyProject}
+        onVerifyProjectDescription={handleVerifyProjectDescription}
+        onVerified={handleQuestVerified}
+      />
 
       {xpToast !== null && (
         <XpToast
@@ -544,23 +444,36 @@ function QuestCard({
         </ul>
       )}
 
-      {/* AI verification */}
+      {/* Quest type badge */}
+      <div className="mt-3 flex items-center gap-1.5">
+        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-500 border border-slate-200">
+          {quest.type === 'quiz' && 'Quiz'}
+          {quest.type === 'reflection' && 'Reflection'}
+          {quest.type === 'ideation' && 'Ideation'}
+          {quest.type === 'project' && 'Project'}
+        </span>
+      </div>
+
+      {/* Verification */}
       {quest.isVerified ? (
-        <div className="mt-3 flex items-center gap-1.5 text-emerald-600 text-xs font-semibold">
+        <div className="mt-2 flex items-center gap-1.5 text-emerald-600 text-xs font-semibold">
           <CheckCircle className="w-3.5 h-3.5" />
-          AI Verified
+          Verified
         </div>
       ) : column === "done" ? (
         <Button
           onClick={() => onVerify(quest)}
           variant="outline"
-          className="mt-3 w-full py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-2 border-emerald-200 hover:text-emerald-800 text-xs font-semibold rounded-lg"
+          className="mt-2 w-full py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-2 border-emerald-200 hover:text-emerald-800 text-xs font-semibold rounded-lg"
         >
           <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-          Verify via AI
+          {quest.type === 'quiz' && 'Take Quiz'}
+          {quest.type === 'reflection' && 'Write Reflection'}
+          {quest.type === 'ideation' && 'Submit Idea'}
+          {quest.type === 'project' && 'Submit Proof'}
         </Button>
       ) : (
-        <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-400 font-mono">
+        <div className="mt-2 flex items-center gap-1.5 text-xs text-slate-400 font-mono">
           <Lock className="w-3 h-3" />
           Complete all tasks first
         </div>

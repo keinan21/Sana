@@ -42,6 +42,13 @@ const ResourceSchema = z.object({
 
 export type Resource = z.infer<typeof ResourceSchema>;
 
+const QuizQuestionSchema = z.object({
+  id: z.string().describe("Unique question id, e.g. q1, q2"),
+  question: z.string().describe("The quiz question text"),
+  options: z.array(z.string()).min(2).max(6).describe("Multiple choice options (2-6)"),
+  correctAnswer: z.number().min(0).describe("Index of the correct option in the options array"),
+});
+
 const TodoSchema = z.object({
   id: z.string().describe("Unique todo id, e.g. t1, t2, t3"),
   task: z.string().describe("In-depth material & concrete action the learner must complete"),
@@ -61,6 +68,14 @@ const ModulSchema = z.object({
     ),
   done: z.boolean().default(false),
   todos: z.array(TodoSchema),
+  type: z.enum(['quiz', 'reflection', 'ideation', 'project']).optional().default('project')
+    .describe("Quest type: quiz=theoretical, reflection=conceptual, ideation=planning/ideas, project=hands-on/publication"),
+  quizData: z.array(QuizQuestionSchema).optional()
+    .describe("Required for quiz type: 2-3 multiple choice questions with correct answers"),
+  minReflectionLength: z.number().optional().default(100)
+    .describe("Minimum character count for reflection/ideation submissions"),
+  proofInstructions: z.string().optional()
+    .describe("Required for project type: specific instruction about what link to submit (e.g. 'Share your GitHub repository URL' or 'Paste a link to your published blog post on Medium/LinkedIn')"),
 });
 
 const LearningCircuitSchema = z.object({
@@ -95,6 +110,14 @@ const LiteModulSchema = z.object({
     ),
   done: z.boolean().default(false),
   todos: z.array(LiteTodoSchema),
+  type: z.enum(['quiz', 'reflection', 'ideation', 'project']).optional().default('project')
+    .describe("Quest type: quiz=theoretical, reflection=conceptual, ideation=planning/ideas, project=hands-on/publication"),
+  quizData: z.array(QuizQuestionSchema).optional()
+    .describe("Required for quiz type: 2-3 multiple choice questions with correct answers"),
+  minReflectionLength: z.number().optional().default(100)
+    .describe("Minimum character count for reflection/ideation submissions"),
+  proofInstructions: z.string().optional()
+    .describe("Required for project type: specific instruction about what link to submit (e.g. 'Share your GitHub repository URL' or 'Paste a link to your published blog post on Medium/LinkedIn')"),
 });
 
 const LiteLearningCircuitSchema = z.object({
@@ -243,10 +266,18 @@ async function runCuratorAgent(
       'You curator. Turn research into JSON matching schema.\n' +
       `Level: ${input.experienceLevel}. Hours/week: ${input.weeklyHoursCommitment}. Expectation: "${input.expectations}".\n` +
       'Rules:\n' +
-      '1. Last modul MUST be publication (github/blog/social).\n' +
+      '1. Last modul MUST be publication (github/blog/social) with type "project".\n' +
       '2. idealDaysToComplete: low level or low hours = more days. Calculate rationally.\n' +
-      '3. CRITICAL: resources MUST have 1-2 real entries per todo. Never empty. Use real URLs from research data.\n' +
-      '4. Use research info only. NO making things up.\n\n' +
+      '3. Assign type to each modul. Be smart about it:\n' +
+      '   - "quiz": only for foundational/theory moduls where clear right/wrong answers exist. Include quizData with 2-3 MCQs.\n' +
+      '   - "reflection": for conceptual/analysis moduls where understanding is demonstrated through writing.\n' +
+      '   - "ideation": for planning/design moduls where user must describe their approach or idea.\n' +
+      '   - "project": for hands-on implementation moduls where tangible output is produced (code, deployment, publication).\n' +
+      '   IMPORTANT: NOT every non-quiz/non-reflection modul is a project. Only use "project" when the output is a real deployable/public artifact.\n' +
+      '4. For "project" type moduls: set proofInstructions to tell the user exactly what kind of link to submit (e.g. "Share your GitHub repository URL", "Post your live app link", "Submit your LinkedIn/Medium blog post URL", "Paste your deployed project URL").\n' +
+      '5. For "quiz" type moduls: include quizData with 2-3 multiple choice questions, each with 4 options and the correctAnswer index.\n' +
+      '6. CRITICAL: resources MUST have 1-2 real entries per todo. Never empty. Use real URLs from research data.\n' +
+      '7. Use research info only. NO making things up.\n\n' +
       `RESEARCH:\n${researchText}`,
     outputSchema: LearningCircuitSchema,
   });
@@ -284,10 +315,18 @@ async function runLiteCuratorAgent(
       'You curator. Output JSON matching schema.\n' +
       `Level: ${input.experienceLevel}. Hours/week: ${input.weeklyHoursCommitment}. Expectation: "${input.expectations}".\n` +
       'Rules:\n' +
-      '1. Last modul MUST be publication (github/blog/social).\n' +
+      '1. Last modul MUST be publication (github/blog/social) with type "project".\n' +
       '2. idealDaysToComplete: low level or low hours = more days. Calculate rationally.\n' +
-      '3. Do NOT include any resources/links. Leave resources array empty.\n' +
-      '4. Use your own knowledge. NO making things up.\n',
+      '3. Assign type to each modul. Be smart about it:\n' +
+      '   - "quiz": only for foundational/theory moduls where clear right/wrong answers exist. Include quizData with 2-3 MCQs.\n' +
+      '   - "reflection": for conceptual/analysis moduls where understanding is demonstrated through writing.\n' +
+      '   - "ideation": for planning/design moduls where user must describe their approach or idea.\n' +
+      '   - "project": for hands-on implementation moduls where tangible output is produced (code, deployment, publication).\n' +
+      '   IMPORTANT: NOT every non-quiz/non-reflection modul is a project. Only use "project" when the output is a real deployable/public artifact.\n' +
+      '4. For "project" type moduls: set proofInstructions to tell the user exactly what kind of link to submit (e.g. "Share your GitHub repository URL", "Post your live app link", "Submit your LinkedIn/Medium blog post URL", "Paste your deployed project URL").\n' +
+      '5. For "quiz" type moduls: include quizData with 2-3 multiple choice questions, each with 4 options and the correctAnswer index.\n' +
+      '6. Do NOT include any resources/links. Leave resources array empty.\n' +
+      '7. Use your own knowledge. NO making things up.\n',
     outputSchema: LiteLearningCircuitSchema,
   });
 
@@ -567,5 +606,101 @@ export async function verifyModulProgress(
   } catch (error) {
     console.error('Error during proof verification:', error);
     return { success: false, error: 'Failed to verify proof of work.' };
+  }
+}
+
+// ============================================================
+// IDEATION VERIFICATION — Idea & Planning Quality Auditor
+// ============================================================
+function buildIdeationPrompt(
+  modulTitle: string,
+  campaignDescription: string,
+  modulTasks: string[],
+  ideaText: string
+): string {
+  return (
+    'You are a supportive yet honest Idea Mentor.\n' +
+    '\n' +
+    'A learner has submitted their idea or plan for a quest. Evaluate it.\n' +
+    '\n' +
+    `QUEST TITLE: "${modulTitle}"\n` +
+    `CAMPAIGN DESCRIPTION: "${campaignDescription}"\n` +
+    'QUEST TASKS:\n' +
+    `${modulTasks.map((t, i) => `${i + 1}. ${t}`).join('\n')}\n` +
+    '\n' +
+    'LEARNER\'S IDEA:\n' +
+    `${ideaText}\n` +
+    '\n' +
+    'INSTRUCTIONS:\n' +
+    '- Evaluate if the idea is coherent, thoughtful, and aligned with the quest goals.\n' +
+    '- If the idea is well-developed and shows genuine effort, mark isVerified=true.\n' +
+    '- If the idea is vague, off-track, or needs more thought, mark isVerified=false and explain why.\n' +
+    '- ALWAYS include genuine encouragement and appreciation for their effort, regardless of outcome.\n' +
+    '- Be constructive: if rejected, suggest specific ways to improve the idea.\n' +
+    '- Output the evaluation as structured JSON with isVerified, feedback, and confidenceScore.'
+  );
+}
+
+export async function verifyIdeation(
+  modulTitle: string,
+  ideaText: string,
+  campaignDescription: string,
+  modulTasks: string[],
+  apiKey: string,
+  model: string = 'gemini-3.5-flash'
+): Promise<{
+  success: boolean;
+  isVerified?: boolean;
+  feedback?: string;
+  confidenceScore?: number;
+  error?: string;
+}> {
+  const gemini = new Gemini({ model, apiKey });
+
+  const prompt = buildIdeationPrompt(
+    modulTitle,
+    campaignDescription,
+    modulTasks,
+    ideaText
+  );
+
+  const agent = new LlmAgent({
+    name: 'ideation_verification_agent',
+    model: gemini,
+    instruction: prompt,
+    outputSchema: VerificationResultSchema,
+  });
+
+  try {
+    const finalText = await runAgentAndGetFinalText(
+      agent,
+      'ideation_verification_app',
+      'Evaluate the idea now.'
+    );
+
+    if (!finalText) {
+      return { success: false, error: 'Agent did not produce a response.' };
+    }
+
+    const cleanJson = sanitizeJsonBlock(finalText);
+    const parsed: unknown = JSON.parse(cleanJson);
+    const validated = VerificationResultSchema.safeParse(parsed);
+
+    if (validated.success) {
+      return {
+        success: true,
+        isVerified: validated.data.isVerified,
+        feedback: validated.data.feedback,
+        confidenceScore: validated.data.confidenceScore,
+      };
+    }
+
+    return {
+      success: false,
+      error: `Invalid response format: ${validated.error.message}`,
+    };
+  } catch (error) {
+    console.error('Error during ideation verification:', error);
+    return { success: false, error: 'Failed to verify idea.' };
   }
 }
