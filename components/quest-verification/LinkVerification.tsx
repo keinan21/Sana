@@ -1,30 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { CheckCircle, XCircle, Loader2, Sparkles, ExternalLink, ImageIcon } from "lucide-react";
+import { CheckCircle, XCircle, Loader2, Sparkles, ExternalLink } from "lucide-react";
 
-const IMAGE_PLATFORMS = [
-  "instagram.com",
-  "imgur.com",
-  "flickr.com",
-  "500px.com",
-  "unsplash.com",
-  "deviantart.com",
-  "artstation.com",
-  "pinterest.com",
-  "behance.net",
-  "dribbble.com",
-  "tinypic.com",
-  "photobucket.com",
-  "imgbb.com",
-  "postimg.cc",
-];
-
-const IMAGE_EXTENSIONS = /\.(jpg|jpeg|png|gif|webp|svg|avif|bmp|ico)(\?.*)?$/i;
+const ACCEPTED_PLATFORMS = ["GitHub", "X (Twitter)", "LinkedIn", "Medium", "personal blogs"];
 
 function isValidUrl(value: string): boolean {
   try {
@@ -35,96 +17,62 @@ function isValidUrl(value: string): boolean {
   }
 }
 
-function isImagePlatform(url: string): boolean {
-  try {
-    const hostname = new URL(url).hostname.replace(/^www\./, "");
-    return IMAGE_PLATFORMS.some((p) => hostname === p || hostname.endsWith("." + p));
-  } catch {
-    return false;
-  }
-}
-
-function isDirectImageUrl(url: string): boolean {
-  return IMAGE_EXTENSIONS.test(url);
-}
-
-interface ProjectVerificationProps {
+interface LinkVerificationProps {
   questTitle: string;
-  proofInstructions?: string;
+  linkInstructions?: string;
   onSubmitUrl: (url: string) => Promise<{ success: boolean; isVerified?: boolean; feedback?: string; confidenceScore?: number; error?: string }>;
-  onSubmitDescription: (label: string, description: string) => Promise<{ success: boolean; isVerified?: boolean; feedback?: string; confidenceScore?: number; error?: string }>;
+  onVerified?: () => void;
 }
 
-export function ProjectVerification({
+export function LinkVerification({
   questTitle,
-  proofInstructions,
+  linkInstructions,
   onSubmitUrl,
-  onSubmitDescription,
-}: ProjectVerificationProps) {
+  onVerified,
+}: LinkVerificationProps) {
   const [url, setUrl] = useState("");
-  const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [verified, setVerified] = useState(false);
   const [feedback, setFeedback] = useState<{ isVerified: boolean; feedback: string; confidenceScore: number } | null>(null);
 
   const validUrl = isValidUrl(url);
-  const isImageLink = validUrl && (isImagePlatform(url) || isDirectImageUrl(url));
 
   const handleSubmit = async () => {
     if (!url.trim() || !validUrl) return;
     setSubmitting(true);
     setFeedback(null);
 
-    if (isImageLink) {
-      if (!description.trim()) {
-        setSubmitting(false);
-        return;
-      }
-      const result = await onSubmitDescription(
-        `Visual post: ${url}`,
-        description.trim()
-      );
-      if (result.success) {
-        setFeedback({
-          isVerified: result.isVerified || false,
-          feedback: result.feedback || "No feedback provided.",
-          confidenceScore: result.confidenceScore || 0,
-        });
-      } else {
-        setFeedback({
-          isVerified: false,
-          feedback: result.error || "Failed to verify submission.",
-          confidenceScore: 0,
-        });
+    const result = await onSubmitUrl(url.trim());
+    if (result.success) {
+      setFeedback({
+        isVerified: result.isVerified || false,
+        feedback: result.feedback || "No feedback provided.",
+        confidenceScore: result.confidenceScore || 0,
+      });
+      if (result.isVerified) {
+        setVerified(true);
+        setTimeout(() => onVerified?.(), 1500);
       }
     } else {
-      const result = await onSubmitUrl(url.trim());
-      if (result.success) {
-        setFeedback({
-          isVerified: result.isVerified || false,
-          feedback: result.feedback || "No feedback provided.",
-          confidenceScore: result.confidenceScore || 0,
-        });
-      } else {
-        setFeedback({
-          isVerified: false,
-          feedback: result.error || "Failed to verify submission.",
-          confidenceScore: 0,
-        });
-      }
+      setFeedback({
+        isVerified: false,
+        feedback: result.error || "Failed to verify submission.",
+        confidenceScore: 0,
+      });
     }
     setSubmitting(false);
   };
 
   return (
     <div className="space-y-4 pt-2">
-      {/* Quest-specific proof instructions */}
-      {proofInstructions && (
+      {/* Quest-specific link instructions */}
+      {linkInstructions && (
         <div className="p-3 bg-amber-50 border-2 border-amber-200 rounded-xl text-xs space-y-1">
           <p className="font-semibold text-amber-800 text-xs flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5" />
             Required Submission
           </p>
-          <p className="text-amber-700 leading-relaxed">{proofInstructions}</p>
+          <p className="text-amber-700 leading-relaxed">{linkInstructions}</p>
         </div>
       )}
 
@@ -136,9 +84,9 @@ export function ProjectVerification({
         <Input
           value={url}
           onChange={(e) => { setUrl(e.target.value); setFeedback(null); }}
-          placeholder="Paste your public submission link here (GitHub, LinkedIn, Medium, etc.)"
+          placeholder="Paste your public link (GitHub, X, LinkedIn, Medium, blog...)"
           className="w-full p-3 border-2 border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus-visible:border-emerald-400 focus-visible:ring-emerald-400/20 text-xs rounded-xl"
-          disabled={submitting}
+          disabled={submitting || verified}
         />
         {url && !validUrl && (
           <p className="text-xs text-red-500 font-medium">
@@ -156,30 +104,10 @@ export function ProjectVerification({
             Preview link
           </a>
         )}
+        <p className="text-[10px] text-slate-400">
+          Accepted: {ACCEPTED_PLATFORMS.join(", ")}. If the AI cannot access your link, try explaining what you built in an essay instead.
+        </p>
       </div>
-
-      {/* Image-based URL fallback: text description */}
-      {isImageLink && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-700">
-            <ImageIcon className="w-3.5 h-3.5" />
-            Image-based platform detected
-          </div>
-          <Label className="text-xs font-semibold text-slate-700">
-            Describe What You Created
-          </Label>
-          <Textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Since we can't view images directly, please describe what you posted or created in detail. What did you make? What tools did you use? What was your process?"
-            className="w-full min-h-[120px] p-3 border-2 border-amber-200 bg-amber-50/50 text-slate-900 placeholder-slate-400 focus-visible:border-emerald-400 focus-visible:ring-emerald-400/20 text-xs resize-none rounded-xl"
-            disabled={submitting}
-          />
-          <p className="text-xs text-amber-600 font-mono">
-            {description.length} characters
-          </p>
-        </div>
-      )}
 
       {/* Feedback */}
       {feedback && (
@@ -215,10 +143,12 @@ export function ProjectVerification({
       <div className="flex justify-end">
         <Button
           onClick={handleSubmit}
-          disabled={submitting || !validUrl || (isImageLink && !description.trim())}
+          disabled={submitting || verified || !validUrl}
           className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2 border-2 border-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:border-slate-200"
         >
-          {submitting ? (
+          {verified ? (
+            <><CheckCircle className="w-3 h-3 mr-1.5" /> ✓ Verified & Locked</>
+          ) : submitting ? (
             <><Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> Verifying...</>
           ) : (
             <><Sparkles className="w-3 h-3 mr-1.5" /> Submit for Review</>

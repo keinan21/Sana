@@ -1,11 +1,4 @@
-export type QuestType = 'quiz' | 'reflection' | 'ideation' | 'project';
-
-export interface QuizQuestion {
-  id: string;
-  question: string;
-  options: string[];
-  correctAnswer: number;
-}
+export type QuestType = 'reflection' | 'essay' | 'link';
 
 export interface Resource {
   platform: string;
@@ -23,13 +16,18 @@ export interface TodoItem {
 export interface Modul {
   id: string;
   title: string;
+  description?: string;
   idealDaysToComplete: number;
+  createdAt?: string;
   done: boolean;
   todos: TodoItem[];
+  resources?: Resource[];
   type?: QuestType;
-  quizData?: QuizQuestion[];
   minReflectionLength?: number;
-  proofInstructions?: string;
+  essayPrompt?: string;
+  linkInstructions?: string;
+  verificationAnswer?: string;
+  verificationResponse?: string;
 }
 
 export interface LearningCircuitData {
@@ -51,11 +49,15 @@ export interface Quest {
   id: string;
   title: string;
   description: string;
+  idealDaysToComplete: number;
+  createdAt?: string;
   tasks: Task[];
   isVerified: boolean;
   learningLinks: Resource[];
-  type: QuestType;
-  quizData?: QuizQuestion[];
+  type: QuestType | null;
   minReflectionLength?: number;
-  proofInstructions?: string;
+  essayPrompt?: string;
+  linkInstructions?: string;
+  verificationAnswer?: string;
+  verificationResponse?: string;
 }

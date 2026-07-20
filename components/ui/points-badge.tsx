@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import Image from "next/image"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Sparkle } from "lucide-react"
 
@@ -82,13 +81,10 @@ const PointsBadge = React.forwardRef<HTMLDivElement, PointsBadgeProps>(
         <div className="flex items-center gap-2">
           {badgeUrl ? (
             <div>
-              <Image
+              <img
                 src={badgeUrl}
                 alt=""
                 aria-hidden="true"
-                unoptimized
-                width={32}
-                height={32}
                 className={cn("shrink-0 rounded object-contain", badgeSize)}
               />
             </div>

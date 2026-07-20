@@ -23,6 +23,8 @@
   },
   "registries": {
     "@shadcn-space": "https://shadcnspace.com/r/{name}.json",
-    "@magicui": "https://magicui.design/r/{name}"
+    "@magicui": "https://magicui.design/r/{name}",
+    "@trophy": "https://ui.trophy.so/r/{name}.json",
+    "@watermelonui": "https://registry.watermelon.sh/{name}.json"
   }
 }

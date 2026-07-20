@@ -13,6 +13,7 @@ import {
   GOOGLE_SEARCH,
 } from '@google/adk';
 
+
 // ============================================================
 // 1. INPUT SCHEMA — Learning Circuit form
 // ============================================================
@@ -42,13 +43,6 @@ const ResourceSchema = z.object({
 
 export type Resource = z.infer<typeof ResourceSchema>;
 
-const QuizQuestionSchema = z.object({
-  id: z.string().describe("Unique question id, e.g. q1, q2"),
-  question: z.string().describe("The quiz question text"),
-  options: z.array(z.string()).min(2).max(6).describe("Multiple choice options (2-6)"),
-  correctAnswer: z.number().min(0).describe("Index of the correct option in the options array"),
-});
-
 const TodoSchema = z.object({
   id: z.string().describe("Unique todo id, e.g. t1, t2, t3"),
   task: z.string().describe("In-depth material & concrete action the learner must complete"),
@@ -68,14 +62,6 @@ const ModulSchema = z.object({
     ),
   done: z.boolean().default(false),
   todos: z.array(TodoSchema),
-  type: z.enum(['quiz', 'reflection', 'ideation', 'project']).optional().default('project')
-    .describe("Quest type: quiz=theoretical, reflection=conceptual, ideation=planning/ideas, project=hands-on/publication"),
-  quizData: z.array(QuizQuestionSchema).optional()
-    .describe("Required for quiz type: 2-3 multiple choice questions with correct answers"),
-  minReflectionLength: z.number().optional().default(100)
-    .describe("Minimum character count for reflection/ideation submissions"),
-  proofInstructions: z.string().optional()
-    .describe("Required for project type: specific instruction about what link to submit (e.g. 'Share your GitHub repository URL' or 'Paste a link to your published blog post on Medium/LinkedIn')"),
 });
 
 const LearningCircuitSchema = z.object({
@@ -110,14 +96,6 @@ const LiteModulSchema = z.object({
     ),
   done: z.boolean().default(false),
   todos: z.array(LiteTodoSchema),
-  type: z.enum(['quiz', 'reflection', 'ideation', 'project']).optional().default('project')
-    .describe("Quest type: quiz=theoretical, reflection=conceptual, ideation=planning/ideas, project=hands-on/publication"),
-  quizData: z.array(QuizQuestionSchema).optional()
-    .describe("Required for quiz type: 2-3 multiple choice questions with correct answers"),
-  minReflectionLength: z.number().optional().default(100)
-    .describe("Minimum character count for reflection/ideation submissions"),
-  proofInstructions: z.string().optional()
-    .describe("Required for project type: specific instruction about what link to submit (e.g. 'Share your GitHub repository URL' or 'Paste a link to your published blog post on Medium/LinkedIn')"),
 });
 
 const LiteLearningCircuitSchema = z.object({
@@ -129,8 +107,22 @@ const LiteLearningCircuitSchema = z.object({
 });
 
 // ============================================================
-// 3. PROOF OF WORK VERIFICATION SCHEMA (Strict Code Reviewer)
+// 3. VERIFICATION SCHEMAS
 // ============================================================
+
+// Schema for lazy verification type determination
+const VerificationTypeSchema = z.object({
+  type: z.enum(['reflection', 'essay', 'link']).describe(
+    'The most appropriate verification type for these learning tasks'
+  ),
+  minReflectionLength: z.number().min(50).max(500).optional().default(100)
+    .describe('Required for reflection type: minimum character count for the reflection'),
+  essayPrompt: z.string().optional()
+    .describe('Required for essay type: a specific question to answer or topic to analyze'),
+  linkInstructions: z.string().optional()
+    .describe('Required for link type: what kind of link to submit as proof of work'),
+});
+
 const VerificationResultSchema = z.object({
   isVerified: z.boolean().describe(
     'True ONLY if the practical proof genuinely correlates with the quest requirements.'
@@ -229,7 +221,10 @@ async function runResearchAgent(input: LearningCircuitInput, gemini: Gemini): Pr
     model: gemini,
     instruction:
       'You research agent. Search internet with Google Search. ' +
-      'Find: best practices. Find: 2026 roadmap. Find: official docs. Find: common beginner mistakes. ' +
+      'Find: best practices. Find: roadmap. Find: official docs. Find: common beginner mistakes. ' +
+      'CRITICAL: Only include URLs verified LIVE today. Prefer resources published within the last 2 years. ' +
+      'For YouTube: direct video URLs only, from active channels. No channel/playlist pages. ' +
+      'Prefer established platforms (official docs, MDN, freeCodeCamp, Coursera, GitHub repos with recent activity). ' +
       'Found a good link? Record url EXACTLY as-is. ' +
       'Write summary as bullet points, dense, no fluff. ' +
       'NO JSON. NO fake links.',
@@ -266,18 +261,11 @@ async function runCuratorAgent(
       'You curator. Turn research into JSON matching schema.\n' +
       `Level: ${input.experienceLevel}. Hours/week: ${input.weeklyHoursCommitment}. Expectation: "${input.expectations}".\n` +
       'Rules:\n' +
-      '1. Last modul MUST be publication (github/blog/social) with type "project".\n' +
-      '2. idealDaysToComplete: low level or low hours = more days. Calculate rationally.\n' +
-      '3. Assign type to each modul. Be smart about it:\n' +
-      '   - "quiz": only for foundational/theory moduls where clear right/wrong answers exist. Include quizData with 2-3 MCQs.\n' +
-      '   - "reflection": for conceptual/analysis moduls where understanding is demonstrated through writing.\n' +
-      '   - "ideation": for planning/design moduls where user must describe their approach or idea.\n' +
-      '   - "project": for hands-on implementation moduls where tangible output is produced (code, deployment, publication).\n' +
-      '   IMPORTANT: NOT every non-quiz/non-reflection modul is a project. Only use "project" when the output is a real deployable/public artifact.\n' +
-      '4. For "project" type moduls: set proofInstructions to tell the user exactly what kind of link to submit (e.g. "Share your GitHub repository URL", "Post your live app link", "Submit your LinkedIn/Medium blog post URL", "Paste your deployed project URL").\n' +
-      '5. For "quiz" type moduls: include quizData with 2-3 multiple choice questions, each with 4 options and the correctAnswer index.\n' +
-      '6. CRITICAL: resources MUST have 1-2 real entries per todo. Never empty. Use real URLs from research data.\n' +
-      '7. Use research info only. NO making things up.\n\n' +
+      '1. idealDaysToComplete: low level or low hours = more days. Calculate rationally.\n' +
+      '2. CRITICAL: resources MUST have 1-2 real entries per todo. Never empty. Use real URLs from research data.\n' +
+      '3. Only use URLs that look like genuine, established-platform URLs. Reject placeholder URLs, example.com, or obviously hallucinated paths.\n' +
+      '4. For YouTube: only use youtube.com/watch?v=... format. No channel pages, no playlist URLs.\n' +
+      '5. Use research info only. NO making things up.\n\n' +
       `RESEARCH:\n${researchText}`,
     outputSchema: LearningCircuitSchema,
   });
@@ -315,18 +303,9 @@ async function runLiteCuratorAgent(
       'You curator. Output JSON matching schema.\n' +
       `Level: ${input.experienceLevel}. Hours/week: ${input.weeklyHoursCommitment}. Expectation: "${input.expectations}".\n` +
       'Rules:\n' +
-      '1. Last modul MUST be publication (github/blog/social) with type "project".\n' +
-      '2. idealDaysToComplete: low level or low hours = more days. Calculate rationally.\n' +
-      '3. Assign type to each modul. Be smart about it:\n' +
-      '   - "quiz": only for foundational/theory moduls where clear right/wrong answers exist. Include quizData with 2-3 MCQs.\n' +
-      '   - "reflection": for conceptual/analysis moduls where understanding is demonstrated through writing.\n' +
-      '   - "ideation": for planning/design moduls where user must describe their approach or idea.\n' +
-      '   - "project": for hands-on implementation moduls where tangible output is produced (code, deployment, publication).\n' +
-      '   IMPORTANT: NOT every non-quiz/non-reflection modul is a project. Only use "project" when the output is a real deployable/public artifact.\n' +
-      '4. For "project" type moduls: set proofInstructions to tell the user exactly what kind of link to submit (e.g. "Share your GitHub repository URL", "Post your live app link", "Submit your LinkedIn/Medium blog post URL", "Paste your deployed project URL").\n' +
-      '5. For "quiz" type moduls: include quizData with 2-3 multiple choice questions, each with 4 options and the correctAnswer index.\n' +
-      '6. Do NOT include any resources/links. Leave resources array empty.\n' +
-      '7. Use your own knowledge. NO making things up.\n',
+      '1. idealDaysToComplete: low level or low hours = more days. Calculate rationally.\n' +
+      '2. Do NOT include any resources/links. Leave resources array empty.\n' +
+      '3. Use your own knowledge. NO making things up.\n',
     outputSchema: LiteLearningCircuitSchema,
   });
 
@@ -400,7 +379,10 @@ async function findReplacementLink(
     model: gemini,
     instruction:
       'You link finder. Find 1 valid, live url with Google Search. ' +
-      'Official/trusted source. Reply ONLY the raw url. No markdown. No explanation. ' +
+      'Official/trusted source. Prefer content published within the last 2 years. ' +
+      'For YouTube: verify the video still exists and is publicly accessible. ' +
+      'Prefer established tutorial sites, official docs, and reputable educational platforms. ' +
+      'Reply ONLY the raw url. No markdown. No explanation. ' +
       'Not found? Reply: NOT_FOUND.',
     tools: [GOOGLE_SEARCH],
   });
@@ -505,15 +487,170 @@ export async function generateLearningCampaign(
 }
 
 // ============================================================
+// QUEST GENERATION SCHEMAS (for in-campaign AI generation)
+// ============================================================
+
+const GeneratedQuestSchema = z.object({
+  title: z.string().describe("Title of the quest"),
+  description: z.string().optional().describe("Brief description of what this quest covers"),
+  idealDaysToComplete: z.number().describe("Estimated days to complete this quest"),
+  tasks: z.array(z.string()).min(1).describe("Concrete actionable tasks for this quest"),
+});
+
+const GeneratedQuestsSchema = z.object({
+  quests: z.array(GeneratedQuestSchema).min(1).max(5),
+});
+
+// ============================================================
+// GENERATE QUESTS — AI generates quests for an existing campaign
+// ============================================================
+export async function generateQuests(
+  campaignTitle: string,
+  campaignDescription: string,
+  userPrompt: string,
+  apiKey: string,
+  model: string = 'gemini-3.5-flash',
+  count: number = 3
+): Promise<{ success: boolean; data?: Modul[]; error?: string }> {
+  const gemini = new Gemini({ model, apiKey });
+
+  const agent = new LlmAgent({
+    name: 'quest_generator_agent',
+    model: gemini,
+    instruction:
+      'You are a learning curriculum designer. ' +
+      `Generate exactly ${count} quests that fit within the given campaign. ` +
+      'Each quest must be a logical milestone with concrete, actionable tasks. ' +
+      'Tasks should be specific and measurable. ' +
+      'Output JSON matching the schema with an array of quests.',
+    outputSchema: GeneratedQuestsSchema,
+  });
+
+  const query =
+    `Campaign: "${campaignTitle}"\n` +
+    `Description: "${campaignDescription}"\n` +
+    `User request: "${userPrompt}"\n` +
+    `Generate ${count} quests.`;
+
+  try {
+    const finalText = await runAgentAndGetFinalText(agent, 'quest_generator_app', query);
+
+    if (!finalText) {
+      return { success: false, error: 'Agent did not produce a response.' };
+    }
+
+    const cleanJson = sanitizeJsonBlock(finalText);
+    const parsed: unknown = JSON.parse(cleanJson);
+    const validated = GeneratedQuestsSchema.safeParse(parsed);
+
+    if (!validated.success) {
+      return { success: false, error: `Invalid response format: ${validated.error.message}` };
+    }
+
+    const moduls: Modul[] = validated.data.quests.map((q) => ({
+      id: crypto.randomUUID(),
+      title: q.title,
+      description: q.description,
+      idealDaysToComplete: q.idealDaysToComplete,
+      done: false,
+      todos: q.tasks.map((task) => ({
+        id: crypto.randomUUID(),
+        task,
+        isDone: false,
+        resources: [],
+      })),
+    }));
+
+    return { success: true, data: moduls };
+  } catch (error) {
+    console.error('generateQuests error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to generate quests',
+    };
+  }
+}
+
+// ============================================================
+// TASK RESOURCE GENERATION — AI suggests learning resources
+// ============================================================
+const TaskResourceSchema = z.object({
+  platform: z.string().describe("Source platform name, e.g. YouTube, Article, Official Docs, Blog"),
+  title: z.string().describe("Short descriptive title of the resource"),
+  url: z.string().describe("A valid HTTP/HTTPS URL to the resource"),
+});
+
+const TaskResourcesSchema = z.object({
+  resources: z.array(TaskResourceSchema).min(1).max(3),
+});
+
+export async function generateTaskResources(
+  taskText: string,
+  campaignTitle: string,
+  campaignDescription: string,
+  apiKey: string,
+  model: string = 'gemini-3.5-flash'
+): Promise<{ success: boolean; data?: { platform: string; title: string; url: string }[]; error?: string }> {
+  const gemini = new Gemini({ model, apiKey });
+
+  const agent = new LlmAgent({
+    name: 'task_resource_agent',
+    model: gemini,
+    instruction:
+      'You are a learning resource curator. ' +
+      'Given a learning task and the campaign context, suggest 1-3 real, helpful educational resources. ' +
+      'CRITICAL: Only recommend resources that are LIVE and publicly accessible today. ' +
+      'Prefer content published within the last 2 years from established authors and platforms. ' +
+      'For YouTube: direct video URLs only (youtube.com/watch?v=...). No channel/playlist pages. ' +
+      'Avoid AI-generated or spammy blog posts. Prefer official docs, established tutorial sites, and reputable courses. ' +
+      'Include the platform name (e.g. YouTube, Article, Official Docs, Blog, Course), a short title, and a valid URL. ' +
+      'Output JSON matching the given schema.',
+    outputSchema: TaskResourcesSchema,
+  });
+
+  const query =
+    `Campaign: "${campaignTitle}"\n` +
+    `Campaign Description: "${campaignDescription}"\n` +
+    `Task: "${taskText}"\n` +
+    `Suggest 1-3 educational resources for this task.`;
+
+  try {
+    const finalText = await runAgentAndGetFinalText(agent, 'task_resource_app', query);
+
+    if (!finalText) {
+      return { success: false, error: 'Agent did not produce a response.' };
+    }
+
+    const cleanJson = sanitizeJsonBlock(finalText);
+    const parsed: unknown = JSON.parse(cleanJson);
+    const validated = TaskResourcesSchema.safeParse(parsed);
+
+    if (!validated.success) {
+      return { success: false, error: `Invalid response format: ${validated.error.message}` };
+    }
+
+    return { success: true, data: validated.data.resources };
+  } catch (error) {
+    console.error('generateTaskResources error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to generate resources',
+    };
+  }
+}
+
+// ============================================================
 // PROOF OF WORK VERIFICATION — Strict Technical Code Reviewer
 // ============================================================
-const PROOF_TYPE_LABELS: Record<string, string> = {
+const LINK_PROOF_TYPE_LABELS: Record<string, string> = {
   github_repo: 'GitHub Repository URL',
   live_app: 'Live App / Production Link',
   technical_snippet: 'Technical Snippet (Console Logs / Code Blocks)',
+  blog_post: 'Blog Post / Article URL',
+  social_post: 'Social Media Post URL',
 };
 
-function buildVerificationPrompt(
+function buildLinkVerificationPrompt(
   modulTitle: string,
   campaignDescription: string,
   modulTasks: string[],
@@ -538,12 +675,13 @@ function buildVerificationPrompt(
     '- You are a pragmatic, strict reviewer. Do NOT accept vague theoretical summaries.\n' +
     '- Inspect the submission. If it is a GitHub link, evaluate if the user description of their code structure sounds sane and matches the quest goals.\n' +
     '- If it is a log/snippet, verify that it represents execution, not just text copying.\n' +
+    '- If it is a blog post or social post, evaluate if the content demonstrates the learning.\n' +
     '- Be strict but encouraging.\n' +
     '- Output the evaluation as structured JSON with isVerified, feedback, and confidenceScore.'
   );
 }
 
-export async function verifyModulProgress(
+export async function verifyLinkProgress(
   modulTitle: string,
   proofType: string,
   proofContent: string,
@@ -560,16 +698,16 @@ export async function verifyModulProgress(
 }> {
   const gemini = new Gemini({ model, apiKey });
 
-  const prompt = buildVerificationPrompt(
+  const prompt = buildLinkVerificationPrompt(
     modulTitle,
     campaignDescription,
     modulTasks,
-    PROOF_TYPE_LABELS[proofType] || proofType,
+    LINK_PROOF_TYPE_LABELS[proofType] || proofType,
     proofContent
   );
 
   const agent = new LlmAgent({
-    name: 'proof_verification_agent',
+    name: 'link_verification_agent',
     model: gemini,
     instruction: prompt,
     outputSchema: VerificationResultSchema,
@@ -578,7 +716,7 @@ export async function verifyModulProgress(
   try {
     const finalText = await runAgentAndGetFinalText(
       agent,
-      'proof_verification_app',
+      'link_verification_app',
       'Evaluate the proof of work now.'
     );
 
@@ -604,46 +742,49 @@ export async function verifyModulProgress(
       error: `Invalid response format: ${validated.error.message}`,
     };
   } catch (error) {
-    console.error('Error during proof verification:', error);
+    console.error('Error during link verification:', error);
     return { success: false, error: 'Failed to verify proof of work.' };
   }
 }
 
 // ============================================================
-// IDEATION VERIFICATION — Idea & Planning Quality Auditor
+// ESSAY VERIFICATION — Written Analysis Quality Auditor
 // ============================================================
-function buildIdeationPrompt(
+function buildEssayPrompt(
   modulTitle: string,
   campaignDescription: string,
   modulTasks: string[],
-  ideaText: string
+  essayPrompt: string,
+  essayText: string
 ): string {
   return (
-    'You are a supportive yet honest Idea Mentor.\n' +
+    'You are a supportive yet rigorous Learning Mentor.\n' +
     '\n' +
-    'A learner has submitted their idea or plan for a quest. Evaluate it.\n' +
+    'A learner has submitted a written essay/analysis for a quest. Evaluate it.\n' +
     '\n' +
     `QUEST TITLE: "${modulTitle}"\n` +
     `CAMPAIGN DESCRIPTION: "${campaignDescription}"\n` +
     'QUEST TASKS:\n' +
     `${modulTasks.map((t, i) => `${i + 1}. ${t}`).join('\n')}\n` +
     '\n' +
-    'LEARNER\'S IDEA:\n' +
-    `${ideaText}\n` +
+    `ESSAY PROMPT: "${essayPrompt}"\n` +
+    'LEARNER\'S ESSAY:\n' +
+    `${essayText}\n` +
     '\n' +
     'INSTRUCTIONS:\n' +
-    '- Evaluate if the idea is coherent, thoughtful, and aligned with the quest goals.\n' +
-    '- If the idea is well-developed and shows genuine effort, mark isVerified=true.\n' +
-    '- If the idea is vague, off-track, or needs more thought, mark isVerified=false and explain why.\n' +
+    '- Evaluate if the essay thoughtfully addresses the prompt and demonstrates understanding of the quest concepts.\n' +
+    '- If the essay shows genuine comprehension, effort, and alignment with the learning goals, mark isVerified=true.\n' +
+    '- If the essay is superficial, off-topic, or shows lack of understanding, mark isVerified=false and explain why.\n' +
     '- ALWAYS include genuine encouragement and appreciation for their effort, regardless of outcome.\n' +
-    '- Be constructive: if rejected, suggest specific ways to improve the idea.\n' +
+    '- Be constructive: if rejected, suggest specific ways to improve the analysis.\n' +
     '- Output the evaluation as structured JSON with isVerified, feedback, and confidenceScore.'
   );
 }
 
-export async function verifyIdeation(
+export async function verifyEssay(
   modulTitle: string,
-  ideaText: string,
+  essayText: string,
+  essayPrompt: string,
   campaignDescription: string,
   modulTasks: string[],
   apiKey: string,
@@ -657,15 +798,16 @@ export async function verifyIdeation(
 }> {
   const gemini = new Gemini({ model, apiKey });
 
-  const prompt = buildIdeationPrompt(
+  const prompt = buildEssayPrompt(
     modulTitle,
     campaignDescription,
     modulTasks,
-    ideaText
+    essayPrompt,
+    essayText
   );
 
   const agent = new LlmAgent({
-    name: 'ideation_verification_agent',
+    name: 'essay_verification_agent',
     model: gemini,
     instruction: prompt,
     outputSchema: VerificationResultSchema,
@@ -674,8 +816,8 @@ export async function verifyIdeation(
   try {
     const finalText = await runAgentAndGetFinalText(
       agent,
-      'ideation_verification_app',
-      'Evaluate the idea now.'
+      'essay_verification_app',
+      'Evaluate the essay now.'
     );
 
     if (!finalText) {
@@ -700,7 +842,191 @@ export async function verifyIdeation(
       error: `Invalid response format: ${validated.error.message}`,
     };
   } catch (error) {
-    console.error('Error during ideation verification:', error);
-    return { success: false, error: 'Failed to verify idea.' };
+    console.error('Error during essay verification:', error);
+    return { success: false, error: 'Failed to verify essay.' };
+  }
+}
+
+// ============================================================
+// REFLECTION VERIFICATION — Engagement & Understanding Evaluator
+// ============================================================
+function buildReflectionPrompt(
+  modulTitle: string,
+  campaignDescription: string,
+  modulTasks: string[],
+  reflectionText: string
+): string {
+  return (
+    'You are a supportive yet thoughtful Learning Mentor.\n' +
+    '\n' +
+    'A learner has submitted a personal reflection on their learning journey. Evaluate it.\n' +
+    '\n' +
+    `QUEST TITLE: "${modulTitle}"\n` +
+    `CAMPAIGN DESCRIPTION: "${campaignDescription}"\n` +
+    'QUEST TASKS:\n' +
+    `${modulTasks.map((t, i) => `${i + 1}. ${t}`).join('\n')}\n` +
+    '\n' +
+    'LEARNER\'S REFLECTION:\n' +
+    `${reflectionText}\n` +
+    '\n' +
+    'INSTRUCTIONS:\n' +
+    '- Evaluate if the reflection demonstrates genuine engagement, learning, and understanding of the quest concepts.\n' +
+    '- If the reflection shows sincere effort, personal insight, and alignment with the learning goals, mark isVerified=true.\n' +
+    '- If the reflection is superficial, generic, or shows no real engagement with the material, mark isVerified=false and explain why.\n' +
+    '- ALWAYS include genuine encouragement and appreciation for their effort, regardless of outcome.\n' +
+    '- Be constructive: if rejected, suggest how to deepen their reflection.\n' +
+    '- Output the evaluation as structured JSON with isVerified, feedback, and confidenceScore.'
+  );
+}
+
+export async function verifyReflection(
+  modulTitle: string,
+  reflectionText: string,
+  campaignDescription: string,
+  modulTasks: string[],
+  apiKey: string,
+  model: string = 'gemini-3.5-flash'
+): Promise<{
+  success: boolean;
+  isVerified?: boolean;
+  feedback?: string;
+  confidenceScore?: number;
+  error?: string;
+}> {
+  const gemini = new Gemini({ model, apiKey });
+
+  const prompt = buildReflectionPrompt(
+    modulTitle,
+    campaignDescription,
+    modulTasks,
+    reflectionText
+  );
+
+  const agent = new LlmAgent({
+    name: 'reflection_verification_agent',
+    model: gemini,
+    instruction: prompt,
+    outputSchema: VerificationResultSchema,
+  });
+
+  try {
+    const finalText = await runAgentAndGetFinalText(
+      agent,
+      'reflection_verification_app',
+      'Evaluate the reflection now.'
+    );
+
+    if (!finalText) {
+      return { success: false, error: 'Agent did not produce a response.' };
+    }
+
+    const cleanJson = sanitizeJsonBlock(finalText);
+    const parsed: unknown = JSON.parse(cleanJson);
+    const validated = VerificationResultSchema.safeParse(parsed);
+
+    if (validated.success) {
+      return {
+        success: true,
+        isVerified: validated.data.isVerified,
+        feedback: validated.data.feedback,
+        confidenceScore: validated.data.confidenceScore,
+      };
+    }
+
+    return {
+      success: false,
+      error: `Invalid response format: ${validated.error.message}`,
+    };
+  } catch (error) {
+    console.error('Error during reflection verification:', error);
+    return { success: false, error: 'Failed to verify reflection.' };
+  }
+}
+
+// ============================================================
+// LAZY VERIFICATION TYPE DETERMINATION
+// Called when user clicks "Verify Quest" - determines the
+// appropriate verification type and generates prompts based
+// on the actual learning tasks in the modul.
+// ============================================================
+function buildVerificationTypePrompt(
+  modulTitle: string,
+  tasks: string[],
+): string {
+  return (
+    'You are a learning experience designer.\n' +
+    '\n' +
+    'Given a quest title and its learning tasks, determine the best verification type and generate the appropriate prompt.\n' +
+    '\n' +
+    `QUEST TITLE: "${modulTitle}"\n` +
+    'LEARNING TASKS:\n' +
+    `${tasks.map((t, i) => `${i + 1}. ${t}`).join('\n')}\n` +
+    '\n' +
+    'INSTRUCTIONS:\n' +
+    'Choose the verification type based on the tasks:\n' +
+    '- "reflection": for conceptual tasks where the learner reflects on what they learned. Set minReflectionLength (default 100).\n' +
+    '- "essay": for analysis, explanation, or demonstration of understanding. Set essayPrompt with the specific question to answer.\n' +
+    '- "link": for hands-on tasks where a tangible output is produced (code, deployment, publication). Set linkInstructions describing exactly what link to submit.\n' +
+    'IMPORTANT: Tasks involving visual/creative output (pixel art, drawings, design files, images, videos) cannot be verified via link. Use "essay" instead for such tasks.\n' +
+    'Pick the most appropriate type and fill in the required field for that type.\n' +
+    'Output the evaluation as structured JSON with type and the appropriate fields.'
+  );
+}
+
+export async function determineVerificationType(
+  modulTitle: string,
+  tasks: string[],
+  apiKey: string,
+  model: string = 'gemini-3.5-flash'
+): Promise<{
+  success: boolean;
+  data?: {
+    type: 'reflection' | 'essay' | 'link';
+    minReflectionLength?: number;
+    essayPrompt?: string;
+    linkInstructions?: string;
+  };
+  error?: string;
+}> {
+  const gemini = new Gemini({ model, apiKey });
+
+  const prompt = buildVerificationTypePrompt(modulTitle, tasks);
+
+  const agent = new LlmAgent({
+    name: 'verification_type_agent',
+    model: gemini,
+    instruction: prompt,
+    outputSchema: VerificationTypeSchema,
+  });
+
+  try {
+    const finalText = await runAgentAndGetFinalText(
+      agent,
+      'verification_type_app',
+      'Determine the verification type now.'
+    );
+
+    if (!finalText) {
+      return { success: false, error: 'Agent did not produce a response.' };
+    }
+
+    const cleanJson = sanitizeJsonBlock(finalText);
+    const parsed: unknown = JSON.parse(cleanJson);
+    const validated = VerificationTypeSchema.safeParse(parsed);
+
+    if (validated.success) {
+      return {
+        success: true,
+        data: validated.data,
+      };
+    }
+
+    return {
+      success: false,
+      error: `Invalid response format: ${validated.error.message}`,
+    };
+  } catch (error) {
+    console.error('Error during verification type determination:', error);
+    return { success: false, error: 'Failed to determine verification type.' };
   }
 }

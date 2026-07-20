@@ -3,43 +3,41 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Sparkles, CheckCircle } from "lucide-react";
-import { QuizVerification } from "./QuizVerification";
 import { ReflectionVerification } from "./ReflectionVerification";
-import { IdeationVerification } from "./IdeationVerification";
-import { ProjectVerification } from "./ProjectVerification";
+import { EssayVerification } from "./EssayVerification";
+import { LinkVerification } from "./LinkVerification";
 import type { Quest } from "@/lib/types";
 
 interface QuestVerificationDialogProps {
   quest: Quest | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onVerifyIdeation: (quest: Quest, ideaText: string) => Promise<{ success: boolean; isVerified?: boolean; feedback?: string; confidenceScore?: number; error?: string }>;
-  onVerifyProject: (quest: Quest, url: string) => Promise<{ success: boolean; isVerified?: boolean; feedback?: string; confidenceScore?: number; error?: string }>;
-  onVerifyProjectDescription: (quest: Quest, label: string, description: string) => Promise<{ success: boolean; isVerified?: boolean; feedback?: string; confidenceScore?: number; error?: string }>;
+  onVerifyReflection: (quest: Quest, text: string) => Promise<{ success: boolean; isVerified?: boolean; feedback?: string; confidenceScore?: number; error?: string }>;
+  onVerifyEssay: (quest: Quest, essayText: string) => Promise<{ success: boolean; isVerified?: boolean; feedback?: string; confidenceScore?: number; error?: string }>;
+  onVerifyLink: (quest: Quest, url: string) => Promise<{ success: boolean; isVerified?: boolean; feedback?: string; confidenceScore?: number; error?: string }>;
   onVerified: (quest: Quest) => void;
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  quiz: "Answer the quiz questions to pass this quest",
-  reflection: "Write your reflection and key takeaways",
-  ideation: "Describe your idea or plan for AI review",
-  project: "Submit a public link as proof of work",
+  reflection: "Write a brief reflection on what you learned",
+  essay: "Submit a written analysis for AI review",
+  link: "Submit a public link as proof of work",
 };
 
 export function QuestVerificationDialog({
   quest,
   open,
   onOpenChange,
-  onVerifyIdeation,
-  onVerifyProject,
-  onVerifyProjectDescription,
+  onVerifyReflection,
+  onVerifyEssay,
+  onVerifyLink,
   onVerified,
 }: QuestVerificationDialogProps) {
   const [verified, setVerified] = useState(false);
 
   if (!quest) return null;
 
-  const questType = quest.type || "project";
+  const questType = quest.type || "link";
   const label = TYPE_LABELS[questType] || "Submit proof of work";
 
   const handleVerified = () => {
@@ -62,16 +60,14 @@ export function QuestVerificationDialog({
         <DialogHeader>
           <DialogTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-emerald-600" />
-            {questType === "quiz" && "Quiz Quest"}
             {questType === "reflection" && "Reflection Quest"}
-            {questType === "ideation" && "Ideation Quest"}
-            {questType === "project" && "Project Quest"}
+            {questType === "essay" && "Essay Quest"}
+            {questType === "link" && "Link Quest"}
           </DialogTitle>
           <DialogDescription className="text-xs text-slate-500">
             {verified
               ? `Quest "${quest.title}" verified successfully!`
-              : `${label} for "${quest.title}"`
-            }
+              : `${label} for "${quest.title}"`}
           </DialogDescription>
         </DialogHeader>
 
@@ -82,30 +78,27 @@ export function QuestVerificationDialog({
           </div>
         ) : (
           <>
-            {questType === "quiz" && quest.quizData && (
-              <QuizVerification
-                quizData={quest.quizData}
-                onVerified={handleVerified}
-              />
-            )}
             {questType === "reflection" && (
               <ReflectionVerification
                 minLength={quest.minReflectionLength}
+                onSubmitReflection={async (text) => onVerifyReflection(quest, text)}
                 onVerified={handleVerified}
               />
             )}
-            {questType === "ideation" && (
-              <IdeationVerification
+            {questType === "essay" && quest.essayPrompt && (
+              <EssayVerification
                 questTitle={quest.title}
-                onSubmitIdea={async (ideaText) => onVerifyIdeation(quest, ideaText)}
+                essayPrompt={quest.essayPrompt}
+                onSubmitEssay={async (essayText) => onVerifyEssay(quest, essayText)}
+                onVerified={handleVerified}
               />
             )}
-            {questType === "project" && (
-              <ProjectVerification
+            {questType === "link" && (
+              <LinkVerification
                 questTitle={quest.title}
-                proofInstructions={quest.proofInstructions}
-                onSubmitUrl={async (url) => onVerifyProject(quest, url)}
-                onSubmitDescription={async (label, description) => onVerifyProjectDescription(quest, label, description)}
+                linkInstructions={quest.linkInstructions}
+                onSubmitUrl={async (url) => onVerifyLink(quest, url)}
+                onVerified={handleVerified}
               />
             )}
           </>

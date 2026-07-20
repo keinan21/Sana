@@ -28,11 +28,11 @@ export default function GlobalNavbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white border-b-2 border-slate-200">
+    <header className="sticky top-0 z-50 w-full bg-paper-white border-b-2 border-faded-gray">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 md:px-8">
         <a
           href="/dashboard"
-          className="text-lg font-semibold tracking-tight text-slate-900 hover:text-slate-600 transition-colors"
+          className="font-feather text-xl font-black tracking-[-0.02em] text-eager-green transition-colors hover:opacity-80"
         >
           sana
         </a>
@@ -43,23 +43,15 @@ export default function GlobalNavbar() {
               key={link.label}
               href={link.href}
               className={cn(
-                "inline-flex h-9 items-center rounded-lg px-3 text-sm font-medium transition-colors",
+                "inline-flex h-9 items-center rounded-xl border-2 px-3 text-nav-label font-bold uppercase tracking-[0.0530em] transition-colors",
                 isActive(link.href)
-                  ? "text-emerald-700 bg-emerald-50 border-2 border-emerald-200"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                  ? "border-eager-green bg-storybook-green text-eager-green"
+                  : "border-faded-gray bg-transparent text-pencil-gray hover:border-charcoal hover:text-charcoal"
               )}
             >
               {link.label}
             </a>
           ))}
-          <button
-            type="button"
-            onClick={() => router.push("/campaign/create")}
-            className="ml-3 inline-flex h-9 items-center gap-1.5 rounded-lg bg-emerald-600 px-4 text-sm font-semibold text-white border-2 border-emerald-700 hover:bg-emerald-500 transition-colors"
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            New Campaign
-          </button>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -69,7 +61,7 @@ export default function GlobalNavbar() {
             type="button"
             aria-label="Toggle navigation menu"
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="inline-flex size-9 items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors md:hidden"
+            className="inline-flex size-9 items-center justify-center rounded-xl border-2 border-faded-gray text-pencil-gray hover:border-charcoal hover:text-charcoal transition-colors md:hidden"
           >
             {mobileOpen ? <X className="size-4" /> : <Menu className="size-4" />}
           </button>
@@ -77,7 +69,7 @@ export default function GlobalNavbar() {
       </div>
 
       {mobileOpen && (
-        <div className="border-t-2 border-slate-200 bg-white md:hidden">
+        <div className="border-t-2 border-faded-gray bg-paper-white md:hidden">
           <nav className="space-y-1 px-4 py-3">
             {NAV_LINKS.map((link) => (
               <a
@@ -85,10 +77,10 @@ export default function GlobalNavbar() {
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  "flex h-10 items-center rounded-lg px-3 text-sm font-medium transition-colors",
+                  "flex h-10 items-center rounded-xl border-2 px-3 text-nav-label font-bold uppercase tracking-[0.0530em] transition-colors",
                   isActive(link.href)
-                    ? "text-emerald-700 bg-emerald-50 border-2 border-emerald-200"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    ? "border-eager-green bg-storybook-green text-eager-green"
+                    : "border-faded-gray text-pencil-gray hover:border-charcoal hover:text-charcoal"
                 )}
               >
                 {link.label}
@@ -100,7 +92,7 @@ export default function GlobalNavbar() {
                 setMobileOpen(false)
                 router.push("/campaign/create")
               }}
-              className="flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-4 text-sm font-semibold text-white border-2 border-emerald-700 hover:bg-emerald-500 transition-colors"
+              className="flex h-10 w-full items-center justify-center gap-1.5 rounded-xl bg-eager-green px-4 text-nav-label font-bold uppercase tracking-[0.0530em] text-paper-white border-2 border-eager-green transition-colors hover:bg-[#4db802]"
             >
               <Sparkles className="h-3.5 w-3.5" />
               New Campaign

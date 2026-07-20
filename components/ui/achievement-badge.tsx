@@ -1,15 +1,20 @@
 "use client"
 
 import * as React from "react"
-import Image from "next/image"
-import { Lock, LockOpen, Trophy } from "lucide-react"
+import { Trophy } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface Achievement {
   id: string
   name: string
+  description?: string | null
   trigger: "metric" | "api" | "streak"
   badgeUrl?: string | null
   progress?: number
@@ -17,6 +22,7 @@ interface Achievement {
 }
 
 interface UserAchievement extends Achievement {
+  /** ISO date when earned, or `null` if locked */
   achievedAt: string | null
 }
 
@@ -78,120 +84,121 @@ const AchievementBadge = React.forwardRef<
     const ringDashoffset =
       ringCircumference - (progress / 100) * ringCircumference
 
-    const statusLabel = isUnlocked ? "Unlocked" : "Locked"
+    const statusLabel = isUnlocked ? "Earned" : "Locked"
     const itemLabel = `${achievement.name} - ${statusLabel}`
 
     return (
-      <div
-        ref={ref}
-        role={onAchievementClick ? "button" : "listitem"}
-        aria-label={onAchievementClick ? itemLabel : undefined}
-        tabIndex={onAchievementClick ? 0 : undefined}
-        onClick={() => onAchievementClick?.(achievement)}
-        onKeyDown={
-          onAchievementClick
-            ? (e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault()
-                  onAchievementClick(achievement)
-                }
-              }
-            : undefined
-        }
-        className={cn(
-          "flex flex-col items-center justify-center gap-2 rounded-lg border p-4 transition-all",
-          isUnlocked
-            ? "bg-card border-emerald-500/30 shadow-[0_0_12px_-4px_hsl(160,60%,45%)]"
-            : "border-muted bg-muted/30 opacity-60 grayscale",
-          onAchievementClick && "cursor-pointer",
-          className
-        )}
-        {...props}
-      >
-        <div
-          className="relative flex items-center justify-center"
-          style={{
-            width: hasProgress ? `${ringSize}px` : undefined,
-            height: hasProgress ? `${ringSize}px` : undefined,
-          }}
-        >
-          {hasProgress ? (
-            <svg
-              aria-hidden="true"
-              className="absolute inset-0 h-full w-full"
-              viewBox={`0 0 ${ringSize} ${ringSize}`}
-            >
-              <circle
-                cx={ringSize / 2}
-                cy={ringSize / 2}
-                r={ringRadius}
-                fill="none"
-                stroke={isUnlocked ? "hsl(160, 60%, 45%)" : "var(--primary)"}
-                strokeLinecap="round"
-                strokeWidth={ringStrokeWidth}
-                strokeDasharray={ringCircumference}
-                strokeDashoffset={ringDashoffset}
-                transform={`rotate(-90 ${ringSize / 2} ${ringSize / 2})`}
-              />
-            </svg>
-          ) : null}
-
-          {achievement.badgeUrl ? (
-            <Image
-              src={achievement.badgeUrl}
-              alt={`${achievement.name} badge - ${statusLabel}`}
-              unoptimized
-              width={64}
-              height={64}
-              className={cn(
-                badgeSizeMap[badgeSize],
-                "relative z-10 rounded-full object-cover",
-              )}
-            />
-          ) : (
+      <TooltipProvider delayDuration={200}>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <div
-              aria-hidden="true"
+              ref={ref}
+              role={onAchievementClick ? "button" : "listitem"}
+              aria-label={onAchievementClick ? itemLabel : undefined}
+              tabIndex={onAchievementClick ? 0 : undefined}
+              onClick={() => onAchievementClick?.(achievement)}
+              onKeyDown={
+                onAchievementClick
+                  ? (e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault()
+                        onAchievementClick(achievement)
+                      }
+                    }
+                  : undefined
+              }
               className={cn(
-                badgeSizeMap[badgeSize],
-                "relative z-10 flex items-center justify-center rounded-full",
+                "bg-card flex flex-col items-center justify-center gap-2 rounded-lg border p-4 transition-all duration-200",
+                onAchievementClick && "cursor-pointer",
                 isUnlocked
-                  ? "bg-emerald-500/10 text-emerald-400"
-                  : "bg-muted text-muted-foreground"
+                  ? "border-amber-200/70 shadow-[0_0_12px_-6px_hsl(43,80%,50%)]"
+                  : "opacity-50",
+                className
               )}
             >
-              {isUnlocked ? (
-                <Trophy className={cn(iconSizeMap[badgeSize], "fill-emerald-400/20")} />
-              ) : (
-                <Lock className={iconSizeMap[badgeSize]} />
-              )}
+              <div
+                className="relative flex items-center justify-center"
+                style={{
+                  width: hasProgress ? `${ringSize}px` : undefined,
+                  height: hasProgress ? `${ringSize}px` : undefined,
+                }}
+              >
+                {hasProgress ? (
+                  <svg
+                    aria-hidden="true"
+                    className="absolute inset-0 h-full w-full"
+                    viewBox={`0 0 ${ringSize} ${ringSize}`}
+                  >
+                    <circle
+                      cx={ringSize / 2}
+                      cy={ringSize / 2}
+                      r={ringRadius}
+                      fill="none"
+                      stroke="var(--primary)"
+                      strokeLinecap="round"
+                      strokeWidth={ringStrokeWidth}
+                      strokeDasharray={ringCircumference}
+                      strokeDashoffset={ringDashoffset}
+                      transform={`rotate(-90 ${ringSize / 2} ${ringSize / 2})`}
+                    />
+                  </svg>
+                ) : null}
+
+                {achievement.badgeUrl ? (
+                  <img
+                    src={achievement.badgeUrl}
+                    alt={`${achievement.name} badge - ${statusLabel}`}
+                    className={cn(
+                      badgeSizeMap[badgeSize],
+                      "relative z-10 rounded-full object-cover",
+                      !isUnlocked && "grayscale"
+                    )}
+                  />
+                ) : (
+                  <div
+                    aria-hidden="true"
+                    className={cn(
+                      badgeSizeMap[badgeSize],
+                      "relative z-10 flex items-center justify-center rounded-full",
+                      isUnlocked
+                        ? "bg-amber-100 text-amber-600"
+                        : "bg-slate-100 text-slate-300"
+                    )}
+                  >
+                    <Trophy className={cn(iconSizeMap[badgeSize], isUnlocked && "fill-amber-200")} />
+                  </div>
+                )}
+              </div>
+
+              {rarity !== null ? (
+                <span className="text-muted-foreground text-xs font-medium">
+                  {rarity}% of users
+                </span>
+              ) : null}
+
+              <span
+                className={cn(
+                  "text-center text-sm leading-tight font-bold",
+                  !isUnlocked && "text-muted-foreground"
+                )}
+              >
+                {achievement.name}
+              </span>
             </div>
-          )}
-        </div>
-
-        {rarity !== null ? (
-          <span className="text-muted-foreground text-xs font-medium">
-            {rarity}% of users
-          </span>
-        ) : null}
-
-        <span
-          className={cn(
-            "text-center text-sm leading-tight font-bold",
-            !isUnlocked && "text-muted-foreground"
-          )}
-        >
-          {achievement.name}
-        </span>
-
-        <Badge variant={isUnlocked ? "success" : "secondary"}>
-          {isUnlocked ? (
-            <LockOpen className="h-3 w-3" />
-          ) : (
-            <Lock className="h-3 w-3" />
-          )}
-          {statusLabel}
-        </Badge>
-      </div>
+          </TooltipTrigger>
+          <TooltipContent side="top" align="center" className="max-w-56">
+            <p className="font-semibold">{achievement.name}</p>
+            {achievement.description && (
+              <p className="mt-0.5 text-muted-foreground">{achievement.description}</p>
+            )}
+            {!isUnlocked && (
+              <p className="mt-1 text-xs italic text-muted-foreground/60">
+                {achievement.description ? "Complete to unlock this achievement" : "Still locked"}
+              </p>
+            )}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     )
   }
 )
