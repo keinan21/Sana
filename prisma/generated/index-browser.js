@@ -157,6 +157,16 @@ exports.Prisma.UserAchievementScalarFieldEnum = {
   achievedAt: 'achievedAt'
 };
 
+exports.Prisma.GoogleCalendarTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  expiryDate: 'expiryDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -192,7 +202,8 @@ exports.Prisma.ModelName = {
   User: 'User',
   Campaign: 'Campaign',
   PointsAward: 'PointsAward',
-  UserAchievement: 'UserAchievement'
+  UserAchievement: 'UserAchievement',
+  GoogleCalendarToken: 'GoogleCalendarToken'
 };
 
 /**

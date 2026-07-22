@@ -16,11 +16,9 @@ import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import GlobalNavbar from "@/components/global-navbar"
-import { ApiKeyDialog } from "@/components/ui/api-key-dialog"
 import {
   ArrowRight,
   Flame,
-  KeyRound,
   Sparkles,
   Trophy,
   Zap,
@@ -135,7 +133,6 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [campaigns, setCampaigns] = useState<DashboardCampaign[]>([])
   const [loading, setLoading] = useState(true)
-  const [showApiKeyDialog, setShowApiKeyDialog] = useState(false)
   const [activeTab, setActiveTab] = useState<TabId>("overview")
 
   useEffect(() => {
@@ -274,15 +271,6 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <Button
-              variant="outline"
-              onClick={() => setShowApiKeyDialog(true)}
-              className="border-2 border-faded-gray text-pencil-gray hover:text-charcoal hover:bg-muted text-xs px-2.5 sm:px-3 py-1.5 sm:py-2"
-            >
-              <KeyRound className="h-3.5 w-3.5 mr-1" />
-              <span className="hidden sm:inline">API Key</span>
-              <span className="sm:hidden">Key</span>
-            </Button>
             <Button
               onClick={() => router.push("/campaign/create")}
               className="bg-eager-green hover:bg-[#4db802] text-white font-semibold text-xs px-3 sm:px-4 py-1.5 sm:py-2 border-2 border-eager-green"
@@ -585,17 +573,19 @@ export default function DashboardPage() {
             </div>
 
             {data?.achievements && data.achievements.length > 0 ? (
-              <AchievementGrid
-                achievements={data.achievements.map((a) => ({
-                  id: a.id,
-                  name: a.name,
-                  description: a.description,
-                  trigger: a.trigger,
-                  achievedAt: a.achievedAt,
-                }))}
-                columns={4}
-                gap="lg"
-              />
+              <div className="rounded-xl border-2 border-faded-gray bg-paper-white p-4 sm:p-5">
+                <AchievementGrid
+                  achievements={data.achievements.map((a) => ({
+                    id: a.id,
+                    name: a.name,
+                    description: a.description,
+                    trigger: a.trigger,
+                    achievedAt: a.achievedAt,
+                  }))}
+                  columns="auto"
+                  gap="lg"
+                />
+              </div>
             ) : (
               <div className="rounded-xl border-2 border-faded-gray bg-paper-white p-12 text-center">
                 <Trophy className="h-12 w-12 text-faded-gray mx-auto mb-3" />
@@ -644,8 +634,6 @@ export default function DashboardPage() {
             )}
           </div>
         )}
-
-        <ApiKeyDialog open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog} />
       </div>
     </main>
   )

@@ -9,7 +9,7 @@ export default function Home() {
       <Hero
         brandName="sana"
         eyebrowText="Not Your Ordinary Todo List"
-        title="Boost Your Productivity\nwith the Help of AI"
+        title="Boost Your Productivity with the Help of AI"
         description="Sana turns big ambitions into weekly quests. Earn XP, level up, and let AI keep you honest — no spreadsheets, no guilt, just progress."
         primaryText="Start Your Quest"
         primaryHref="/dashboard"

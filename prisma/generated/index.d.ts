@@ -33,6 +33,11 @@ export type PointsAward = $Result.DefaultSelection<Prisma.$PointsAwardPayload>
  * 
  */
 export type UserAchievement = $Result.DefaultSelection<Prisma.$UserAchievementPayload>
+/**
+ * Model GoogleCalendarToken
+ * 
+ */
+export type GoogleCalendarToken = $Result.DefaultSelection<Prisma.$GoogleCalendarTokenPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -194,6 +199,16 @@ export class PrismaClient<
     * ```
     */
   get userAchievement(): Prisma.UserAchievementDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.googleCalendarToken`: Exposes CRUD operations for the **GoogleCalendarToken** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more GoogleCalendarTokens
+    * const googleCalendarTokens = await prisma.googleCalendarToken.findMany()
+    * ```
+    */
+  get googleCalendarToken(): Prisma.GoogleCalendarTokenDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -631,7 +646,8 @@ export namespace Prisma {
     User: 'User',
     Campaign: 'Campaign',
     PointsAward: 'PointsAward',
-    UserAchievement: 'UserAchievement'
+    UserAchievement: 'UserAchievement',
+    GoogleCalendarToken: 'GoogleCalendarToken'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -647,7 +663,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "campaign" | "pointsAward" | "userAchievement"
+      modelProps: "user" | "campaign" | "pointsAward" | "userAchievement" | "googleCalendarToken"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -947,6 +963,80 @@ export namespace Prisma {
           }
         }
       }
+      GoogleCalendarToken: {
+        payload: Prisma.$GoogleCalendarTokenPayload<ExtArgs>
+        fields: Prisma.GoogleCalendarTokenFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.GoogleCalendarTokenFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.GoogleCalendarTokenFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>
+          }
+          findFirst: {
+            args: Prisma.GoogleCalendarTokenFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.GoogleCalendarTokenFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>
+          }
+          findMany: {
+            args: Prisma.GoogleCalendarTokenFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>[]
+          }
+          create: {
+            args: Prisma.GoogleCalendarTokenCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>
+          }
+          createMany: {
+            args: Prisma.GoogleCalendarTokenCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.GoogleCalendarTokenCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>[]
+          }
+          delete: {
+            args: Prisma.GoogleCalendarTokenDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>
+          }
+          update: {
+            args: Prisma.GoogleCalendarTokenUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>
+          }
+          deleteMany: {
+            args: Prisma.GoogleCalendarTokenDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.GoogleCalendarTokenUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.GoogleCalendarTokenUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>[]
+          }
+          upsert: {
+            args: Prisma.GoogleCalendarTokenUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GoogleCalendarTokenPayload>
+          }
+          aggregate: {
+            args: Prisma.GoogleCalendarTokenAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateGoogleCalendarToken>
+          }
+          groupBy: {
+            args: Prisma.GoogleCalendarTokenGroupByArgs<ExtArgs>
+            result: $Utils.Optional<GoogleCalendarTokenGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.GoogleCalendarTokenCountArgs<ExtArgs>
+            result: $Utils.Optional<GoogleCalendarTokenCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1059,6 +1149,7 @@ export namespace Prisma {
     campaign?: CampaignOmit
     pointsAward?: PointsAwardOmit
     userAchievement?: UserAchievementOmit
+    googleCalendarToken?: GoogleCalendarTokenOmit
   }
 
   /* Types for Logging */
@@ -1416,6 +1507,7 @@ export namespace Prisma {
     campaigns?: boolean | User$campaignsArgs<ExtArgs>
     pointsAwards?: boolean | User$pointsAwardsArgs<ExtArgs>
     achievements?: boolean | User$achievementsArgs<ExtArgs>
+    googleCalendarToken?: boolean | User$googleCalendarTokenArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -1457,6 +1549,7 @@ export namespace Prisma {
     campaigns?: boolean | User$campaignsArgs<ExtArgs>
     pointsAwards?: boolean | User$pointsAwardsArgs<ExtArgs>
     achievements?: boolean | User$achievementsArgs<ExtArgs>
+    googleCalendarToken?: boolean | User$googleCalendarTokenArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -1468,6 +1561,7 @@ export namespace Prisma {
       campaigns: Prisma.$CampaignPayload<ExtArgs>[]
       pointsAwards: Prisma.$PointsAwardPayload<ExtArgs>[]
       achievements: Prisma.$UserAchievementPayload<ExtArgs>[]
+      googleCalendarToken: Prisma.$GoogleCalendarTokenPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -1875,6 +1969,7 @@ export namespace Prisma {
     campaigns<T extends User$campaignsArgs<ExtArgs> = {}>(args?: Subset<T, User$campaignsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CampaignPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     pointsAwards<T extends User$pointsAwardsArgs<ExtArgs> = {}>(args?: Subset<T, User$pointsAwardsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PointsAwardPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     achievements<T extends User$achievementsArgs<ExtArgs> = {}>(args?: Subset<T, User$achievementsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserAchievementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    googleCalendarToken<T extends User$googleCalendarTokenArgs<ExtArgs> = {}>(args?: Subset<T, User$googleCalendarTokenArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2374,6 +2469,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: UserAchievementScalarFieldEnum | UserAchievementScalarFieldEnum[]
+  }
+
+  /**
+   * User.googleCalendarToken
+   */
+  export type User$googleCalendarTokenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    where?: GoogleCalendarTokenWhereInput
   }
 
   /**
@@ -5690,6 +5804,1095 @@ export namespace Prisma {
 
 
   /**
+   * Model GoogleCalendarToken
+   */
+
+  export type AggregateGoogleCalendarToken = {
+    _count: GoogleCalendarTokenCountAggregateOutputType | null
+    _min: GoogleCalendarTokenMinAggregateOutputType | null
+    _max: GoogleCalendarTokenMaxAggregateOutputType | null
+  }
+
+  export type GoogleCalendarTokenMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    accessToken: string | null
+    refreshToken: string | null
+    expiryDate: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type GoogleCalendarTokenMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    accessToken: string | null
+    refreshToken: string | null
+    expiryDate: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type GoogleCalendarTokenCountAggregateOutputType = {
+    id: number
+    userId: number
+    accessToken: number
+    refreshToken: number
+    expiryDate: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type GoogleCalendarTokenMinAggregateInputType = {
+    id?: true
+    userId?: true
+    accessToken?: true
+    refreshToken?: true
+    expiryDate?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type GoogleCalendarTokenMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    accessToken?: true
+    refreshToken?: true
+    expiryDate?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type GoogleCalendarTokenCountAggregateInputType = {
+    id?: true
+    userId?: true
+    accessToken?: true
+    refreshToken?: true
+    expiryDate?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type GoogleCalendarTokenAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which GoogleCalendarToken to aggregate.
+     */
+    where?: GoogleCalendarTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GoogleCalendarTokens to fetch.
+     */
+    orderBy?: GoogleCalendarTokenOrderByWithRelationInput | GoogleCalendarTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: GoogleCalendarTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GoogleCalendarTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GoogleCalendarTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned GoogleCalendarTokens
+    **/
+    _count?: true | GoogleCalendarTokenCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: GoogleCalendarTokenMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: GoogleCalendarTokenMaxAggregateInputType
+  }
+
+  export type GetGoogleCalendarTokenAggregateType<T extends GoogleCalendarTokenAggregateArgs> = {
+        [P in keyof T & keyof AggregateGoogleCalendarToken]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateGoogleCalendarToken[P]>
+      : GetScalarType<T[P], AggregateGoogleCalendarToken[P]>
+  }
+
+
+
+
+  export type GoogleCalendarTokenGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GoogleCalendarTokenWhereInput
+    orderBy?: GoogleCalendarTokenOrderByWithAggregationInput | GoogleCalendarTokenOrderByWithAggregationInput[]
+    by: GoogleCalendarTokenScalarFieldEnum[] | GoogleCalendarTokenScalarFieldEnum
+    having?: GoogleCalendarTokenScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: GoogleCalendarTokenCountAggregateInputType | true
+    _min?: GoogleCalendarTokenMinAggregateInputType
+    _max?: GoogleCalendarTokenMaxAggregateInputType
+  }
+
+  export type GoogleCalendarTokenGroupByOutputType = {
+    id: string
+    userId: string
+    accessToken: string
+    refreshToken: string | null
+    expiryDate: Date
+    createdAt: Date
+    updatedAt: Date
+    _count: GoogleCalendarTokenCountAggregateOutputType | null
+    _min: GoogleCalendarTokenMinAggregateOutputType | null
+    _max: GoogleCalendarTokenMaxAggregateOutputType | null
+  }
+
+  type GetGoogleCalendarTokenGroupByPayload<T extends GoogleCalendarTokenGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<GoogleCalendarTokenGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof GoogleCalendarTokenGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], GoogleCalendarTokenGroupByOutputType[P]>
+            : GetScalarType<T[P], GoogleCalendarTokenGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type GoogleCalendarTokenSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    accessToken?: boolean
+    refreshToken?: boolean
+    expiryDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["googleCalendarToken"]>
+
+  export type GoogleCalendarTokenSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    accessToken?: boolean
+    refreshToken?: boolean
+    expiryDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["googleCalendarToken"]>
+
+  export type GoogleCalendarTokenSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    accessToken?: boolean
+    refreshToken?: boolean
+    expiryDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["googleCalendarToken"]>
+
+  export type GoogleCalendarTokenSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    accessToken?: boolean
+    refreshToken?: boolean
+    expiryDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type GoogleCalendarTokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "accessToken" | "refreshToken" | "expiryDate" | "createdAt" | "updatedAt", ExtArgs["result"]["googleCalendarToken"]>
+  export type GoogleCalendarTokenInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type GoogleCalendarTokenIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type GoogleCalendarTokenIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $GoogleCalendarTokenPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "GoogleCalendarToken"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      accessToken: string
+      refreshToken: string | null
+      expiryDate: Date
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["googleCalendarToken"]>
+    composites: {}
+  }
+
+  type GoogleCalendarTokenGetPayload<S extends boolean | null | undefined | GoogleCalendarTokenDefaultArgs> = $Result.GetResult<Prisma.$GoogleCalendarTokenPayload, S>
+
+  type GoogleCalendarTokenCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<GoogleCalendarTokenFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: GoogleCalendarTokenCountAggregateInputType | true
+    }
+
+  export interface GoogleCalendarTokenDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['GoogleCalendarToken'], meta: { name: 'GoogleCalendarToken' } }
+    /**
+     * Find zero or one GoogleCalendarToken that matches the filter.
+     * @param {GoogleCalendarTokenFindUniqueArgs} args - Arguments to find a GoogleCalendarToken
+     * @example
+     * // Get one GoogleCalendarToken
+     * const googleCalendarToken = await prisma.googleCalendarToken.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends GoogleCalendarTokenFindUniqueArgs>(args: SelectSubset<T, GoogleCalendarTokenFindUniqueArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one GoogleCalendarToken that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {GoogleCalendarTokenFindUniqueOrThrowArgs} args - Arguments to find a GoogleCalendarToken
+     * @example
+     * // Get one GoogleCalendarToken
+     * const googleCalendarToken = await prisma.googleCalendarToken.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends GoogleCalendarTokenFindUniqueOrThrowArgs>(args: SelectSubset<T, GoogleCalendarTokenFindUniqueOrThrowArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first GoogleCalendarToken that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GoogleCalendarTokenFindFirstArgs} args - Arguments to find a GoogleCalendarToken
+     * @example
+     * // Get one GoogleCalendarToken
+     * const googleCalendarToken = await prisma.googleCalendarToken.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends GoogleCalendarTokenFindFirstArgs>(args?: SelectSubset<T, GoogleCalendarTokenFindFirstArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first GoogleCalendarToken that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GoogleCalendarTokenFindFirstOrThrowArgs} args - Arguments to find a GoogleCalendarToken
+     * @example
+     * // Get one GoogleCalendarToken
+     * const googleCalendarToken = await prisma.googleCalendarToken.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends GoogleCalendarTokenFindFirstOrThrowArgs>(args?: SelectSubset<T, GoogleCalendarTokenFindFirstOrThrowArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more GoogleCalendarTokens that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GoogleCalendarTokenFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all GoogleCalendarTokens
+     * const googleCalendarTokens = await prisma.googleCalendarToken.findMany()
+     * 
+     * // Get first 10 GoogleCalendarTokens
+     * const googleCalendarTokens = await prisma.googleCalendarToken.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const googleCalendarTokenWithIdOnly = await prisma.googleCalendarToken.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends GoogleCalendarTokenFindManyArgs>(args?: SelectSubset<T, GoogleCalendarTokenFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a GoogleCalendarToken.
+     * @param {GoogleCalendarTokenCreateArgs} args - Arguments to create a GoogleCalendarToken.
+     * @example
+     * // Create one GoogleCalendarToken
+     * const GoogleCalendarToken = await prisma.googleCalendarToken.create({
+     *   data: {
+     *     // ... data to create a GoogleCalendarToken
+     *   }
+     * })
+     * 
+     */
+    create<T extends GoogleCalendarTokenCreateArgs>(args: SelectSubset<T, GoogleCalendarTokenCreateArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many GoogleCalendarTokens.
+     * @param {GoogleCalendarTokenCreateManyArgs} args - Arguments to create many GoogleCalendarTokens.
+     * @example
+     * // Create many GoogleCalendarTokens
+     * const googleCalendarToken = await prisma.googleCalendarToken.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends GoogleCalendarTokenCreateManyArgs>(args?: SelectSubset<T, GoogleCalendarTokenCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many GoogleCalendarTokens and returns the data saved in the database.
+     * @param {GoogleCalendarTokenCreateManyAndReturnArgs} args - Arguments to create many GoogleCalendarTokens.
+     * @example
+     * // Create many GoogleCalendarTokens
+     * const googleCalendarToken = await prisma.googleCalendarToken.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many GoogleCalendarTokens and only return the `id`
+     * const googleCalendarTokenWithIdOnly = await prisma.googleCalendarToken.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends GoogleCalendarTokenCreateManyAndReturnArgs>(args?: SelectSubset<T, GoogleCalendarTokenCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a GoogleCalendarToken.
+     * @param {GoogleCalendarTokenDeleteArgs} args - Arguments to delete one GoogleCalendarToken.
+     * @example
+     * // Delete one GoogleCalendarToken
+     * const GoogleCalendarToken = await prisma.googleCalendarToken.delete({
+     *   where: {
+     *     // ... filter to delete one GoogleCalendarToken
+     *   }
+     * })
+     * 
+     */
+    delete<T extends GoogleCalendarTokenDeleteArgs>(args: SelectSubset<T, GoogleCalendarTokenDeleteArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one GoogleCalendarToken.
+     * @param {GoogleCalendarTokenUpdateArgs} args - Arguments to update one GoogleCalendarToken.
+     * @example
+     * // Update one GoogleCalendarToken
+     * const googleCalendarToken = await prisma.googleCalendarToken.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends GoogleCalendarTokenUpdateArgs>(args: SelectSubset<T, GoogleCalendarTokenUpdateArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more GoogleCalendarTokens.
+     * @param {GoogleCalendarTokenDeleteManyArgs} args - Arguments to filter GoogleCalendarTokens to delete.
+     * @example
+     * // Delete a few GoogleCalendarTokens
+     * const { count } = await prisma.googleCalendarToken.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends GoogleCalendarTokenDeleteManyArgs>(args?: SelectSubset<T, GoogleCalendarTokenDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more GoogleCalendarTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GoogleCalendarTokenUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many GoogleCalendarTokens
+     * const googleCalendarToken = await prisma.googleCalendarToken.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends GoogleCalendarTokenUpdateManyArgs>(args: SelectSubset<T, GoogleCalendarTokenUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more GoogleCalendarTokens and returns the data updated in the database.
+     * @param {GoogleCalendarTokenUpdateManyAndReturnArgs} args - Arguments to update many GoogleCalendarTokens.
+     * @example
+     * // Update many GoogleCalendarTokens
+     * const googleCalendarToken = await prisma.googleCalendarToken.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more GoogleCalendarTokens and only return the `id`
+     * const googleCalendarTokenWithIdOnly = await prisma.googleCalendarToken.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends GoogleCalendarTokenUpdateManyAndReturnArgs>(args: SelectSubset<T, GoogleCalendarTokenUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one GoogleCalendarToken.
+     * @param {GoogleCalendarTokenUpsertArgs} args - Arguments to update or create a GoogleCalendarToken.
+     * @example
+     * // Update or create a GoogleCalendarToken
+     * const googleCalendarToken = await prisma.googleCalendarToken.upsert({
+     *   create: {
+     *     // ... data to create a GoogleCalendarToken
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the GoogleCalendarToken we want to update
+     *   }
+     * })
+     */
+    upsert<T extends GoogleCalendarTokenUpsertArgs>(args: SelectSubset<T, GoogleCalendarTokenUpsertArgs<ExtArgs>>): Prisma__GoogleCalendarTokenClient<$Result.GetResult<Prisma.$GoogleCalendarTokenPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of GoogleCalendarTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GoogleCalendarTokenCountArgs} args - Arguments to filter GoogleCalendarTokens to count.
+     * @example
+     * // Count the number of GoogleCalendarTokens
+     * const count = await prisma.googleCalendarToken.count({
+     *   where: {
+     *     // ... the filter for the GoogleCalendarTokens we want to count
+     *   }
+     * })
+    **/
+    count<T extends GoogleCalendarTokenCountArgs>(
+      args?: Subset<T, GoogleCalendarTokenCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], GoogleCalendarTokenCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a GoogleCalendarToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GoogleCalendarTokenAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends GoogleCalendarTokenAggregateArgs>(args: Subset<T, GoogleCalendarTokenAggregateArgs>): Prisma.PrismaPromise<GetGoogleCalendarTokenAggregateType<T>>
+
+    /**
+     * Group by GoogleCalendarToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GoogleCalendarTokenGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends GoogleCalendarTokenGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: GoogleCalendarTokenGroupByArgs['orderBy'] }
+        : { orderBy?: GoogleCalendarTokenGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, GoogleCalendarTokenGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetGoogleCalendarTokenGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the GoogleCalendarToken model
+   */
+  readonly fields: GoogleCalendarTokenFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for GoogleCalendarToken.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__GoogleCalendarTokenClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the GoogleCalendarToken model
+   */
+  interface GoogleCalendarTokenFieldRefs {
+    readonly id: FieldRef<"GoogleCalendarToken", 'String'>
+    readonly userId: FieldRef<"GoogleCalendarToken", 'String'>
+    readonly accessToken: FieldRef<"GoogleCalendarToken", 'String'>
+    readonly refreshToken: FieldRef<"GoogleCalendarToken", 'String'>
+    readonly expiryDate: FieldRef<"GoogleCalendarToken", 'DateTime'>
+    readonly createdAt: FieldRef<"GoogleCalendarToken", 'DateTime'>
+    readonly updatedAt: FieldRef<"GoogleCalendarToken", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * GoogleCalendarToken findUnique
+   */
+  export type GoogleCalendarTokenFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which GoogleCalendarToken to fetch.
+     */
+    where: GoogleCalendarTokenWhereUniqueInput
+  }
+
+  /**
+   * GoogleCalendarToken findUniqueOrThrow
+   */
+  export type GoogleCalendarTokenFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which GoogleCalendarToken to fetch.
+     */
+    where: GoogleCalendarTokenWhereUniqueInput
+  }
+
+  /**
+   * GoogleCalendarToken findFirst
+   */
+  export type GoogleCalendarTokenFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which GoogleCalendarToken to fetch.
+     */
+    where?: GoogleCalendarTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GoogleCalendarTokens to fetch.
+     */
+    orderBy?: GoogleCalendarTokenOrderByWithRelationInput | GoogleCalendarTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for GoogleCalendarTokens.
+     */
+    cursor?: GoogleCalendarTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GoogleCalendarTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GoogleCalendarTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of GoogleCalendarTokens.
+     */
+    distinct?: GoogleCalendarTokenScalarFieldEnum | GoogleCalendarTokenScalarFieldEnum[]
+  }
+
+  /**
+   * GoogleCalendarToken findFirstOrThrow
+   */
+  export type GoogleCalendarTokenFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which GoogleCalendarToken to fetch.
+     */
+    where?: GoogleCalendarTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GoogleCalendarTokens to fetch.
+     */
+    orderBy?: GoogleCalendarTokenOrderByWithRelationInput | GoogleCalendarTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for GoogleCalendarTokens.
+     */
+    cursor?: GoogleCalendarTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GoogleCalendarTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GoogleCalendarTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of GoogleCalendarTokens.
+     */
+    distinct?: GoogleCalendarTokenScalarFieldEnum | GoogleCalendarTokenScalarFieldEnum[]
+  }
+
+  /**
+   * GoogleCalendarToken findMany
+   */
+  export type GoogleCalendarTokenFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which GoogleCalendarTokens to fetch.
+     */
+    where?: GoogleCalendarTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GoogleCalendarTokens to fetch.
+     */
+    orderBy?: GoogleCalendarTokenOrderByWithRelationInput | GoogleCalendarTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing GoogleCalendarTokens.
+     */
+    cursor?: GoogleCalendarTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GoogleCalendarTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GoogleCalendarTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of GoogleCalendarTokens.
+     */
+    distinct?: GoogleCalendarTokenScalarFieldEnum | GoogleCalendarTokenScalarFieldEnum[]
+  }
+
+  /**
+   * GoogleCalendarToken create
+   */
+  export type GoogleCalendarTokenCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to create a GoogleCalendarToken.
+     */
+    data: XOR<GoogleCalendarTokenCreateInput, GoogleCalendarTokenUncheckedCreateInput>
+  }
+
+  /**
+   * GoogleCalendarToken createMany
+   */
+  export type GoogleCalendarTokenCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many GoogleCalendarTokens.
+     */
+    data: GoogleCalendarTokenCreateManyInput | GoogleCalendarTokenCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * GoogleCalendarToken createManyAndReturn
+   */
+  export type GoogleCalendarTokenCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * The data used to create many GoogleCalendarTokens.
+     */
+    data: GoogleCalendarTokenCreateManyInput | GoogleCalendarTokenCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * GoogleCalendarToken update
+   */
+  export type GoogleCalendarTokenUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to update a GoogleCalendarToken.
+     */
+    data: XOR<GoogleCalendarTokenUpdateInput, GoogleCalendarTokenUncheckedUpdateInput>
+    /**
+     * Choose, which GoogleCalendarToken to update.
+     */
+    where: GoogleCalendarTokenWhereUniqueInput
+  }
+
+  /**
+   * GoogleCalendarToken updateMany
+   */
+  export type GoogleCalendarTokenUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update GoogleCalendarTokens.
+     */
+    data: XOR<GoogleCalendarTokenUpdateManyMutationInput, GoogleCalendarTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which GoogleCalendarTokens to update
+     */
+    where?: GoogleCalendarTokenWhereInput
+    /**
+     * Limit how many GoogleCalendarTokens to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * GoogleCalendarToken updateManyAndReturn
+   */
+  export type GoogleCalendarTokenUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * The data used to update GoogleCalendarTokens.
+     */
+    data: XOR<GoogleCalendarTokenUpdateManyMutationInput, GoogleCalendarTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which GoogleCalendarTokens to update
+     */
+    where?: GoogleCalendarTokenWhereInput
+    /**
+     * Limit how many GoogleCalendarTokens to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * GoogleCalendarToken upsert
+   */
+  export type GoogleCalendarTokenUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * The filter to search for the GoogleCalendarToken to update in case it exists.
+     */
+    where: GoogleCalendarTokenWhereUniqueInput
+    /**
+     * In case the GoogleCalendarToken found by the `where` argument doesn't exist, create a new GoogleCalendarToken with this data.
+     */
+    create: XOR<GoogleCalendarTokenCreateInput, GoogleCalendarTokenUncheckedCreateInput>
+    /**
+     * In case the GoogleCalendarToken was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<GoogleCalendarTokenUpdateInput, GoogleCalendarTokenUncheckedUpdateInput>
+  }
+
+  /**
+   * GoogleCalendarToken delete
+   */
+  export type GoogleCalendarTokenDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+    /**
+     * Filter which GoogleCalendarToken to delete.
+     */
+    where: GoogleCalendarTokenWhereUniqueInput
+  }
+
+  /**
+   * GoogleCalendarToken deleteMany
+   */
+  export type GoogleCalendarTokenDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which GoogleCalendarTokens to delete
+     */
+    where?: GoogleCalendarTokenWhereInput
+    /**
+     * Limit how many GoogleCalendarTokens to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * GoogleCalendarToken without action
+   */
+  export type GoogleCalendarTokenDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GoogleCalendarToken
+     */
+    select?: GoogleCalendarTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GoogleCalendarToken
+     */
+    omit?: GoogleCalendarTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GoogleCalendarTokenInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -5750,6 +6953,19 @@ export namespace Prisma {
   };
 
   export type UserAchievementScalarFieldEnum = (typeof UserAchievementScalarFieldEnum)[keyof typeof UserAchievementScalarFieldEnum]
+
+
+  export const GoogleCalendarTokenScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    accessToken: 'accessToken',
+    refreshToken: 'refreshToken',
+    expiryDate: 'expiryDate',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type GoogleCalendarTokenScalarFieldEnum = (typeof GoogleCalendarTokenScalarFieldEnum)[keyof typeof GoogleCalendarTokenScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -5893,6 +7109,7 @@ export namespace Prisma {
     campaigns?: CampaignListRelationFilter
     pointsAwards?: PointsAwardListRelationFilter
     achievements?: UserAchievementListRelationFilter
+    googleCalendarToken?: XOR<GoogleCalendarTokenNullableScalarRelationFilter, GoogleCalendarTokenWhereInput> | null
   }
 
   export type UserOrderByWithRelationInput = {
@@ -5907,6 +7124,7 @@ export namespace Prisma {
     campaigns?: CampaignOrderByRelationAggregateInput
     pointsAwards?: PointsAwardOrderByRelationAggregateInput
     achievements?: UserAchievementOrderByRelationAggregateInput
+    googleCalendarToken?: GoogleCalendarTokenOrderByWithRelationInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -5924,6 +7142,7 @@ export namespace Prisma {
     campaigns?: CampaignListRelationFilter
     pointsAwards?: PointsAwardListRelationFilter
     achievements?: UserAchievementListRelationFilter
+    googleCalendarToken?: XOR<GoogleCalendarTokenNullableScalarRelationFilter, GoogleCalendarTokenWhereInput> | null
   }, "id" | "clerkId" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -6135,6 +7354,71 @@ export namespace Prisma {
     achievedAt?: DateTimeWithAggregatesFilter<"UserAchievement"> | Date | string
   }
 
+  export type GoogleCalendarTokenWhereInput = {
+    AND?: GoogleCalendarTokenWhereInput | GoogleCalendarTokenWhereInput[]
+    OR?: GoogleCalendarTokenWhereInput[]
+    NOT?: GoogleCalendarTokenWhereInput | GoogleCalendarTokenWhereInput[]
+    id?: StringFilter<"GoogleCalendarToken"> | string
+    userId?: StringFilter<"GoogleCalendarToken"> | string
+    accessToken?: StringFilter<"GoogleCalendarToken"> | string
+    refreshToken?: StringNullableFilter<"GoogleCalendarToken"> | string | null
+    expiryDate?: DateTimeFilter<"GoogleCalendarToken"> | Date | string
+    createdAt?: DateTimeFilter<"GoogleCalendarToken"> | Date | string
+    updatedAt?: DateTimeFilter<"GoogleCalendarToken"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type GoogleCalendarTokenOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    accessToken?: SortOrder
+    refreshToken?: SortOrderInput | SortOrder
+    expiryDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type GoogleCalendarTokenWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId?: string
+    AND?: GoogleCalendarTokenWhereInput | GoogleCalendarTokenWhereInput[]
+    OR?: GoogleCalendarTokenWhereInput[]
+    NOT?: GoogleCalendarTokenWhereInput | GoogleCalendarTokenWhereInput[]
+    accessToken?: StringFilter<"GoogleCalendarToken"> | string
+    refreshToken?: StringNullableFilter<"GoogleCalendarToken"> | string | null
+    expiryDate?: DateTimeFilter<"GoogleCalendarToken"> | Date | string
+    createdAt?: DateTimeFilter<"GoogleCalendarToken"> | Date | string
+    updatedAt?: DateTimeFilter<"GoogleCalendarToken"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "userId">
+
+  export type GoogleCalendarTokenOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    accessToken?: SortOrder
+    refreshToken?: SortOrderInput | SortOrder
+    expiryDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: GoogleCalendarTokenCountOrderByAggregateInput
+    _max?: GoogleCalendarTokenMaxOrderByAggregateInput
+    _min?: GoogleCalendarTokenMinOrderByAggregateInput
+  }
+
+  export type GoogleCalendarTokenScalarWhereWithAggregatesInput = {
+    AND?: GoogleCalendarTokenScalarWhereWithAggregatesInput | GoogleCalendarTokenScalarWhereWithAggregatesInput[]
+    OR?: GoogleCalendarTokenScalarWhereWithAggregatesInput[]
+    NOT?: GoogleCalendarTokenScalarWhereWithAggregatesInput | GoogleCalendarTokenScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"GoogleCalendarToken"> | string
+    userId?: StringWithAggregatesFilter<"GoogleCalendarToken"> | string
+    accessToken?: StringWithAggregatesFilter<"GoogleCalendarToken"> | string
+    refreshToken?: StringNullableWithAggregatesFilter<"GoogleCalendarToken"> | string | null
+    expiryDate?: DateTimeWithAggregatesFilter<"GoogleCalendarToken"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"GoogleCalendarToken"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"GoogleCalendarToken"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     clerkId: string
@@ -6147,6 +7431,7 @@ export namespace Prisma {
     campaigns?: CampaignCreateNestedManyWithoutUserInput
     pointsAwards?: PointsAwardCreateNestedManyWithoutUserInput
     achievements?: UserAchievementCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -6161,6 +7446,7 @@ export namespace Prisma {
     campaigns?: CampaignUncheckedCreateNestedManyWithoutUserInput
     pointsAwards?: PointsAwardUncheckedCreateNestedManyWithoutUserInput
     achievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -6175,6 +7461,7 @@ export namespace Prisma {
     campaigns?: CampaignUpdateManyWithoutUserNestedInput
     pointsAwards?: PointsAwardUpdateManyWithoutUserNestedInput
     achievements?: UserAchievementUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -6189,6 +7476,7 @@ export namespace Prisma {
     campaigns?: CampaignUncheckedUpdateManyWithoutUserNestedInput
     pointsAwards?: PointsAwardUncheckedUpdateManyWithoutUserNestedInput
     achievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -6403,6 +7691,75 @@ export namespace Prisma {
     achievedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type GoogleCalendarTokenCreateInput = {
+    id?: string
+    accessToken: string
+    refreshToken?: string | null
+    expiryDate: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutGoogleCalendarTokenInput
+  }
+
+  export type GoogleCalendarTokenUncheckedCreateInput = {
+    id?: string
+    userId: string
+    accessToken: string
+    refreshToken?: string | null
+    expiryDate: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GoogleCalendarTokenUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    accessToken?: StringFieldUpdateOperationsInput | string
+    refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutGoogleCalendarTokenNestedInput
+  }
+
+  export type GoogleCalendarTokenUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    accessToken?: StringFieldUpdateOperationsInput | string
+    refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GoogleCalendarTokenCreateManyInput = {
+    id?: string
+    userId: string
+    accessToken: string
+    refreshToken?: string | null
+    expiryDate: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GoogleCalendarTokenUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    accessToken?: StringFieldUpdateOperationsInput | string
+    refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GoogleCalendarTokenUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    accessToken?: StringFieldUpdateOperationsInput | string
+    refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -6482,6 +7839,11 @@ export namespace Prisma {
     every?: UserAchievementWhereInput
     some?: UserAchievementWhereInput
     none?: UserAchievementWhereInput
+  }
+
+  export type GoogleCalendarTokenNullableScalarRelationFilter = {
+    is?: GoogleCalendarTokenWhereInput | null
+    isNot?: GoogleCalendarTokenWhereInput | null
   }
 
   export type SortOrderInput = {
@@ -6822,6 +8184,36 @@ export namespace Prisma {
     achievedAt?: SortOrder
   }
 
+  export type GoogleCalendarTokenCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    accessToken?: SortOrder
+    refreshToken?: SortOrder
+    expiryDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type GoogleCalendarTokenMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    accessToken?: SortOrder
+    refreshToken?: SortOrder
+    expiryDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type GoogleCalendarTokenMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    accessToken?: SortOrder
+    refreshToken?: SortOrder
+    expiryDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
   export type CampaignCreateNestedManyWithoutUserInput = {
     create?: XOR<CampaignCreateWithoutUserInput, CampaignUncheckedCreateWithoutUserInput> | CampaignCreateWithoutUserInput[] | CampaignUncheckedCreateWithoutUserInput[]
     connectOrCreate?: CampaignCreateOrConnectWithoutUserInput | CampaignCreateOrConnectWithoutUserInput[]
@@ -6843,6 +8235,12 @@ export namespace Prisma {
     connect?: UserAchievementWhereUniqueInput | UserAchievementWhereUniqueInput[]
   }
 
+  export type GoogleCalendarTokenCreateNestedOneWithoutUserInput = {
+    create?: XOR<GoogleCalendarTokenCreateWithoutUserInput, GoogleCalendarTokenUncheckedCreateWithoutUserInput>
+    connectOrCreate?: GoogleCalendarTokenCreateOrConnectWithoutUserInput
+    connect?: GoogleCalendarTokenWhereUniqueInput
+  }
+
   export type CampaignUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<CampaignCreateWithoutUserInput, CampaignUncheckedCreateWithoutUserInput> | CampaignCreateWithoutUserInput[] | CampaignUncheckedCreateWithoutUserInput[]
     connectOrCreate?: CampaignCreateOrConnectWithoutUserInput | CampaignCreateOrConnectWithoutUserInput[]
@@ -6862,6 +8260,12 @@ export namespace Prisma {
     connectOrCreate?: UserAchievementCreateOrConnectWithoutUserInput | UserAchievementCreateOrConnectWithoutUserInput[]
     createMany?: UserAchievementCreateManyUserInputEnvelope
     connect?: UserAchievementWhereUniqueInput | UserAchievementWhereUniqueInput[]
+  }
+
+  export type GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput = {
+    create?: XOR<GoogleCalendarTokenCreateWithoutUserInput, GoogleCalendarTokenUncheckedCreateWithoutUserInput>
+    connectOrCreate?: GoogleCalendarTokenCreateOrConnectWithoutUserInput
+    connect?: GoogleCalendarTokenWhereUniqueInput
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -6930,6 +8334,16 @@ export namespace Prisma {
     deleteMany?: UserAchievementScalarWhereInput | UserAchievementScalarWhereInput[]
   }
 
+  export type GoogleCalendarTokenUpdateOneWithoutUserNestedInput = {
+    create?: XOR<GoogleCalendarTokenCreateWithoutUserInput, GoogleCalendarTokenUncheckedCreateWithoutUserInput>
+    connectOrCreate?: GoogleCalendarTokenCreateOrConnectWithoutUserInput
+    upsert?: GoogleCalendarTokenUpsertWithoutUserInput
+    disconnect?: GoogleCalendarTokenWhereInput | boolean
+    delete?: GoogleCalendarTokenWhereInput | boolean
+    connect?: GoogleCalendarTokenWhereUniqueInput
+    update?: XOR<XOR<GoogleCalendarTokenUpdateToOneWithWhereWithoutUserInput, GoogleCalendarTokenUpdateWithoutUserInput>, GoogleCalendarTokenUncheckedUpdateWithoutUserInput>
+  }
+
   export type CampaignUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<CampaignCreateWithoutUserInput, CampaignUncheckedCreateWithoutUserInput> | CampaignCreateWithoutUserInput[] | CampaignUncheckedCreateWithoutUserInput[]
     connectOrCreate?: CampaignCreateOrConnectWithoutUserInput | CampaignCreateOrConnectWithoutUserInput[]
@@ -6970,6 +8384,16 @@ export namespace Prisma {
     update?: UserAchievementUpdateWithWhereUniqueWithoutUserInput | UserAchievementUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: UserAchievementUpdateManyWithWhereWithoutUserInput | UserAchievementUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: UserAchievementScalarWhereInput | UserAchievementScalarWhereInput[]
+  }
+
+  export type GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput = {
+    create?: XOR<GoogleCalendarTokenCreateWithoutUserInput, GoogleCalendarTokenUncheckedCreateWithoutUserInput>
+    connectOrCreate?: GoogleCalendarTokenCreateOrConnectWithoutUserInput
+    upsert?: GoogleCalendarTokenUpsertWithoutUserInput
+    disconnect?: GoogleCalendarTokenWhereInput | boolean
+    delete?: GoogleCalendarTokenWhereInput | boolean
+    connect?: GoogleCalendarTokenWhereUniqueInput
+    update?: XOR<XOR<GoogleCalendarTokenUpdateToOneWithWhereWithoutUserInput, GoogleCalendarTokenUpdateWithoutUserInput>, GoogleCalendarTokenUncheckedUpdateWithoutUserInput>
   }
 
   export type UserCreateNestedOneWithoutCampaignsInput = {
@@ -7014,6 +8438,20 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutAchievementsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAchievementsInput, UserUpdateWithoutAchievementsInput>, UserUncheckedUpdateWithoutAchievementsInput>
+  }
+
+  export type UserCreateNestedOneWithoutGoogleCalendarTokenInput = {
+    create?: XOR<UserCreateWithoutGoogleCalendarTokenInput, UserUncheckedCreateWithoutGoogleCalendarTokenInput>
+    connectOrCreate?: UserCreateOrConnectWithoutGoogleCalendarTokenInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutGoogleCalendarTokenNestedInput = {
+    create?: XOR<UserCreateWithoutGoogleCalendarTokenInput, UserUncheckedCreateWithoutGoogleCalendarTokenInput>
+    connectOrCreate?: UserCreateOrConnectWithoutGoogleCalendarTokenInput
+    upsert?: UserUpsertWithoutGoogleCalendarTokenInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutGoogleCalendarTokenInput, UserUpdateWithoutGoogleCalendarTokenInput>, UserUncheckedUpdateWithoutGoogleCalendarTokenInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -7299,6 +8737,29 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type GoogleCalendarTokenCreateWithoutUserInput = {
+    id?: string
+    accessToken: string
+    refreshToken?: string | null
+    expiryDate: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GoogleCalendarTokenUncheckedCreateWithoutUserInput = {
+    id?: string
+    accessToken: string
+    refreshToken?: string | null
+    expiryDate: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GoogleCalendarTokenCreateOrConnectWithoutUserInput = {
+    where: GoogleCalendarTokenWhereUniqueInput
+    create: XOR<GoogleCalendarTokenCreateWithoutUserInput, GoogleCalendarTokenUncheckedCreateWithoutUserInput>
+  }
+
   export type CampaignUpsertWithWhereUniqueWithoutUserInput = {
     where: CampaignWhereUniqueInput
     update: XOR<CampaignUpdateWithoutUserInput, CampaignUncheckedUpdateWithoutUserInput>
@@ -7382,6 +8843,35 @@ export namespace Prisma {
     achievedAt?: DateTimeFilter<"UserAchievement"> | Date | string
   }
 
+  export type GoogleCalendarTokenUpsertWithoutUserInput = {
+    update: XOR<GoogleCalendarTokenUpdateWithoutUserInput, GoogleCalendarTokenUncheckedUpdateWithoutUserInput>
+    create: XOR<GoogleCalendarTokenCreateWithoutUserInput, GoogleCalendarTokenUncheckedCreateWithoutUserInput>
+    where?: GoogleCalendarTokenWhereInput
+  }
+
+  export type GoogleCalendarTokenUpdateToOneWithWhereWithoutUserInput = {
+    where?: GoogleCalendarTokenWhereInput
+    data: XOR<GoogleCalendarTokenUpdateWithoutUserInput, GoogleCalendarTokenUncheckedUpdateWithoutUserInput>
+  }
+
+  export type GoogleCalendarTokenUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    accessToken?: StringFieldUpdateOperationsInput | string
+    refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GoogleCalendarTokenUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    accessToken?: StringFieldUpdateOperationsInput | string
+    refreshToken?: NullableStringFieldUpdateOperationsInput | string | null
+    expiryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UserCreateWithoutCampaignsInput = {
     id?: string
     clerkId: string
@@ -7393,6 +8883,7 @@ export namespace Prisma {
     createdAt?: Date | string
     pointsAwards?: PointsAwardCreateNestedManyWithoutUserInput
     achievements?: UserAchievementCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCampaignsInput = {
@@ -7406,6 +8897,7 @@ export namespace Prisma {
     createdAt?: Date | string
     pointsAwards?: PointsAwardUncheckedCreateNestedManyWithoutUserInput
     achievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutCampaignsInput = {
@@ -7435,6 +8927,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     pointsAwards?: PointsAwardUpdateManyWithoutUserNestedInput
     achievements?: UserAchievementUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCampaignsInput = {
@@ -7448,6 +8941,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     pointsAwards?: PointsAwardUncheckedUpdateManyWithoutUserNestedInput
     achievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateWithoutPointsAwardsInput = {
@@ -7461,6 +8955,7 @@ export namespace Prisma {
     createdAt?: Date | string
     campaigns?: CampaignCreateNestedManyWithoutUserInput
     achievements?: UserAchievementCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPointsAwardsInput = {
@@ -7474,6 +8969,7 @@ export namespace Prisma {
     createdAt?: Date | string
     campaigns?: CampaignUncheckedCreateNestedManyWithoutUserInput
     achievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPointsAwardsInput = {
@@ -7503,6 +8999,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     campaigns?: CampaignUpdateManyWithoutUserNestedInput
     achievements?: UserAchievementUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPointsAwardsInput = {
@@ -7516,6 +9013,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     campaigns?: CampaignUncheckedUpdateManyWithoutUserNestedInput
     achievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAchievementsInput = {
@@ -7529,6 +9027,7 @@ export namespace Prisma {
     createdAt?: Date | string
     campaigns?: CampaignCreateNestedManyWithoutUserInput
     pointsAwards?: PointsAwardCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAchievementsInput = {
@@ -7542,6 +9041,7 @@ export namespace Prisma {
     createdAt?: Date | string
     campaigns?: CampaignUncheckedCreateNestedManyWithoutUserInput
     pointsAwards?: PointsAwardUncheckedCreateNestedManyWithoutUserInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAchievementsInput = {
@@ -7571,6 +9071,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     campaigns?: CampaignUpdateManyWithoutUserNestedInput
     pointsAwards?: PointsAwardUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAchievementsInput = {
@@ -7584,6 +9085,79 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     campaigns?: CampaignUncheckedUpdateManyWithoutUserNestedInput
     pointsAwards?: PointsAwardUncheckedUpdateManyWithoutUserNestedInput
+    googleCalendarToken?: GoogleCalendarTokenUncheckedUpdateOneWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutGoogleCalendarTokenInput = {
+    id?: string
+    clerkId: string
+    email: string
+    name?: string | null
+    totalXp?: number
+    streakCount?: number
+    lastTaskDate?: Date | string | null
+    createdAt?: Date | string
+    campaigns?: CampaignCreateNestedManyWithoutUserInput
+    pointsAwards?: PointsAwardCreateNestedManyWithoutUserInput
+    achievements?: UserAchievementCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutGoogleCalendarTokenInput = {
+    id?: string
+    clerkId: string
+    email: string
+    name?: string | null
+    totalXp?: number
+    streakCount?: number
+    lastTaskDate?: Date | string | null
+    createdAt?: Date | string
+    campaigns?: CampaignUncheckedCreateNestedManyWithoutUserInput
+    pointsAwards?: PointsAwardUncheckedCreateNestedManyWithoutUserInput
+    achievements?: UserAchievementUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutGoogleCalendarTokenInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutGoogleCalendarTokenInput, UserUncheckedCreateWithoutGoogleCalendarTokenInput>
+  }
+
+  export type UserUpsertWithoutGoogleCalendarTokenInput = {
+    update: XOR<UserUpdateWithoutGoogleCalendarTokenInput, UserUncheckedUpdateWithoutGoogleCalendarTokenInput>
+    create: XOR<UserCreateWithoutGoogleCalendarTokenInput, UserUncheckedCreateWithoutGoogleCalendarTokenInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutGoogleCalendarTokenInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutGoogleCalendarTokenInput, UserUncheckedUpdateWithoutGoogleCalendarTokenInput>
+  }
+
+  export type UserUpdateWithoutGoogleCalendarTokenInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clerkId?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    totalXp?: IntFieldUpdateOperationsInput | number
+    streakCount?: IntFieldUpdateOperationsInput | number
+    lastTaskDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    campaigns?: CampaignUpdateManyWithoutUserNestedInput
+    pointsAwards?: PointsAwardUpdateManyWithoutUserNestedInput
+    achievements?: UserAchievementUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutGoogleCalendarTokenInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clerkId?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    totalXp?: IntFieldUpdateOperationsInput | number
+    streakCount?: IntFieldUpdateOperationsInput | number
+    lastTaskDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    campaigns?: CampaignUncheckedUpdateManyWithoutUserNestedInput
+    pointsAwards?: PointsAwardUncheckedUpdateManyWithoutUserNestedInput
+    achievements?: UserAchievementUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type CampaignCreateManyUserInput = {

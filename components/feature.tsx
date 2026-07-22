@@ -1,10 +1,13 @@
+"use client";
+
+import { motion, type Variants } from "motion/react";
 import {
   BrainCircuit,
-  Trophy,
+  Gauge,
   Columns3,
   KeyRound,
   Sparkles,
-  LineChart,
+  CalendarDays,
 } from "lucide-react";
 
 const FEATURES = [
@@ -16,9 +19,9 @@ const FEATURES = [
     iconColor: "text-white",
   },
   {
-    icon: Trophy,
-    title: "Gamified XP & Levels",
-    desc: "Earn XP for every task completed and quest verified. Level up as you learn, turning discipline into a rewarding game.",
+    icon: Gauge,
+    title: "Gamified XP & Analytics",
+    desc: "Earn XP for every task completed and quest verified. Track your streaks, weekly points, and achievement badges. Level up as you learn, turning discipline into a rewarding game.",
     iconBg: "bg-eager-green",
     iconColor: "text-white",
   },
@@ -44,33 +47,64 @@ const FEATURES = [
     iconColor: "text-white",
   },
   {
-    icon: LineChart,
-    title: "Progress Analytics",
-    desc: "Track your streaks, weekly points, and achievement badges. Stay motivated with clear metrics that show how far you've come.",
-    iconBg: "bg-[#1cb0f6]",
+    icon: CalendarDays,
+    title: "Calendar Quest Planning",
+    desc: "Schedule your quests on an interactive calendar view. Plan your week, set deadlines, and see your entire campaign at a glance.",
+    iconBg: "bg-[#ff6b8a]",
     iconColor: "text-white",
   },
 ];
+
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", duration: 0.72, bounce: 0 },
+  },
+};
+
+const staggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { delayChildren: 0.15, staggerChildren: 0.1 },
+  },
+};
 
 export default function Features1() {
   return (
     <section className="bg-paper-white px-6 py-20">
       <div className="mx-auto max-w-6xl">
-        <h2 className="font-feather text-heading leading-heading font-black tracking-[-0.02em] text-center text-eager-green">
-          This Isn't Your Average Checklist
-        </h2>
-        <p className="mx-auto mt-3 max-w-2xl text-center text-body leading-body font-medium text-pencil-gray">
-          To-do lists are boring. Sana turns your goals into a role-playing game
-          where every task earns XP, unlocks achievements, and builds real
-          skills.
-        </p>
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          <h2 className="font-feather text-heading leading-heading font-black tracking-[-0.02em] text-center text-eager-green">
+            This Isn't Your Average Checklist
+          </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-center text-body leading-body font-medium text-pencil-gray">
+            To-do lists are boring. Sana turns your goals into a role-playing game
+            where every task earns XP, unlocks achievements, and builds real
+            skills.
+          </p>
+        </motion.div>
 
-        <div className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3"
+        >
           {FEATURES.map((f) => {
             const Icon = f.icon;
             return (
-              <div
+              <motion.div
                 key={f.title}
+                variants={fadeUp}
                 className="rounded-xl border-2 border-faded-gray bg-paper-white p-6 transition-colors hover:border-charcoal"
               >
                 <div
@@ -84,10 +118,10 @@ export default function Features1() {
                 <p className="mt-1.5 text-body leading-body text-pencil-gray">
                   {f.desc}
                 </p>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

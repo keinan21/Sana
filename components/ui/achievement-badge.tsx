@@ -1,7 +1,22 @@
 "use client"
 
 import * as React from "react"
-import { Trophy } from "lucide-react"
+import {
+  Trophy,
+  Rocket,
+  Target,
+  Flame,
+  Award,
+  BadgeCheck,
+  Crown,
+  Zap,
+  Footprints,
+  Brain,
+  Mountain,
+  Shield,
+  Flag,
+  Timer,
+} from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import {
@@ -53,6 +68,27 @@ const progressRingSizeMap = {
   xl: 136,
 } as const
 
+function getCategoryFromId(id: string) {
+  if (id === "first_step" || id === "ai_scholar" || id === "consistent_router") return "onboarding"
+  if (id.startsWith("focused_")) return "focused"
+  if (id.startsWith("consistent_")) return "consistent"
+  if (id.startsWith("goal_breaker_")) return "goal_breaker"
+  if (id.startsWith("quest_veteran_")) return "quest_veteran"
+  if (id.startsWith("campaign_champ_")) return "campaign_champ"
+  if (id.startsWith("speed_demon_")) return "speed_demon"
+  return "onboarding"
+}
+
+const categoryConfig: Record<string, { icon: React.ElementType; color: string; bg: string; fill?: string }> = {
+  onboarding: { icon: Rocket, color: "text-spark-blue", bg: "bg-spark-blue/10" },
+  focused: { icon: Target, color: "text-amber-600", bg: "bg-amber-100", fill: "fill-amber-200" },
+  consistent: { icon: Flame, color: "text-orange-500", bg: "bg-orange-100", fill: "fill-orange-200" },
+  goal_breaker: { icon: Trophy, color: "text-amber-600", bg: "bg-amber-100", fill: "fill-amber-200" },
+  quest_veteran: { icon: BadgeCheck, color: "text-eager-green", bg: "bg-storybook-green", fill: "fill-emerald-200" },
+  campaign_champ: { icon: Crown, color: "text-purple-600", bg: "bg-purple-100", fill: "fill-purple-200" },
+  speed_demon: { icon: Zap, color: "text-[#ff4b4b]", bg: "bg-red-100", fill: "fill-red-200" },
+}
+
 const AchievementBadge = React.forwardRef<
   HTMLDivElement,
   AchievementBadgeProps
@@ -84,6 +120,10 @@ const AchievementBadge = React.forwardRef<
     const ringDashoffset =
       ringCircumference - (progress / 100) * ringCircumference
 
+    const category = getCategoryFromId(achievement.id)
+    const config = categoryConfig[category]
+    const CategoryIcon = config.icon
+
     const statusLabel = isUnlocked ? "Earned" : "Locked"
     const itemLabel = `${achievement.name} - ${statusLabel}`
 
@@ -108,11 +148,11 @@ const AchievementBadge = React.forwardRef<
                   : undefined
               }
               className={cn(
-                "bg-card flex flex-col items-center justify-center gap-2 rounded-lg border p-4 transition-all duration-200",
+                "bg-paper-white flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all duration-200",
                 onAchievementClick && "cursor-pointer",
                 isUnlocked
-                  ? "border-amber-200/70 shadow-[0_0_12px_-6px_hsl(43,80%,50%)]"
-                  : "opacity-50",
+                  ? "border-faded-gray shadow-[0_0_12px_-6px_hsl(43,80%,50%)]"
+                  : "border-faded-gray opacity-50",
                 className
               )}
             >
@@ -161,17 +201,17 @@ const AchievementBadge = React.forwardRef<
                       badgeSizeMap[badgeSize],
                       "relative z-10 flex items-center justify-center rounded-full",
                       isUnlocked
-                        ? "bg-amber-100 text-amber-600"
+                        ? `${config.bg} ${config.color}`
                         : "bg-slate-100 text-slate-300"
                     )}
                   >
-                    <Trophy className={cn(iconSizeMap[badgeSize], isUnlocked && "fill-amber-200")} />
+                    <CategoryIcon className={cn(iconSizeMap[badgeSize], isUnlocked && config.fill)} />
                   </div>
                 )}
               </div>
 
               {rarity !== null ? (
-                <span className="text-muted-foreground text-xs font-medium">
+                <span className="text-pencil-gray text-xs font-medium">
                   {rarity}% of users
                 </span>
               ) : null}
@@ -179,7 +219,7 @@ const AchievementBadge = React.forwardRef<
               <span
                 className={cn(
                   "text-center text-sm leading-tight font-bold",
-                  !isUnlocked && "text-muted-foreground"
+                  isUnlocked ? "text-charcoal" : "text-pencil-gray"
                 )}
               >
                 {achievement.name}

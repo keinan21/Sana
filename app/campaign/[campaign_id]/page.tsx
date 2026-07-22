@@ -30,6 +30,8 @@ import GlobalNavbar from "@/components/global-navbar";
 import GridLoader from "@/components/ui/spinner-10";
 import { AddQuestDialog } from "@/components/quest-management/AddQuestDialog";
 import { GenerateQuestsDialog } from "@/components/quest-management/GenerateQuestsDialog";
+import { CalendarSyncButton } from "@/components/calendar-sync-button";
+import { FluidTabs } from "@/components/ui/fluid-tabs";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 function modulToQuest(m: Modul): Quest {
@@ -131,6 +133,7 @@ export default function CampaignDetailPage() {
   const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
   const [confirmDeleteQuestId, setConfirmDeleteQuestId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [mobileTab, setMobileTab] = useState("todo");
 
   useEffect(() => {
     document.title = "Campaign | Sana"
@@ -490,10 +493,10 @@ export default function CampaignDetailPage() {
           Total estimated: {campaignData.totalEstimatedWeeks} {campaignData.totalEstimatedWeeks === 1 ? "week" : "weeks"}
         </span>
 
-        <div className="flex items-center gap-2 mt-4">
+        <div className="flex flex-wrap items-center gap-2 mt-4">
           <Button
             onClick={() => { setEditingQuest(null); setShowAddQuestDialog(true); }}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-3 py-2 border-2 border-emerald-700"
+            className="bg-eager-green hover:bg-[#4db802] text-white text-xs font-bold px-3 py-2 w-full sm:w-auto"
           >
             <Plus className="h-3.5 w-3.5 mr-1" />
             Add Quest
@@ -501,16 +504,79 @@ export default function CampaignDetailPage() {
           <Button
             onClick={() => { setShowGenerateQuestsDialog(true); }}
             variant="outline"
-            className="text-slate-700 border-2 border-slate-200 hover:bg-slate-100 text-xs font-semibold px-3 py-2"
+            className="text-xs font-bold px-3 py-2 w-full sm:w-auto"
           >
-            <Sparkles className="h-3.5 w-3.5 mr-1 text-amber-500" />
+            <Sparkles className="h-3.5 w-3.5 mr-1" />
             Generate Quests
           </Button>
+          <CalendarSyncButton campaignId={campaignId} />
         </div>
       </div>
 
       {/* KANBAN BOARD */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Mobile: fluid tabs with floating bottom bar */}
+      <div className="md:hidden">
+        <div className="pb-28">
+          {COLUMNS.filter((col) => col.key === mobileTab).map((col) => {
+            const items = columnQuests[col.key];
+            return (
+              <div key={col.key} className={`rounded-xl p-4 ${col.bg} border ${col.border}`}>
+                <h3 className={`text-sm font-semibold ${col.text} mb-4 flex items-center gap-2`}>
+                  <ClipboardList className="w-4 h-4" />
+                  {col.title}
+                  <span
+                    className={`ml-auto text-xs font-mono ${col.countBg} ${col.countText} px-2 py-0.5 rounded`}
+                  >
+                    {items.length}
+                  </span>
+                </h3>
+                <div className="space-y-3">
+                  <AnimatePresence mode="popLayout">
+                    {items.map((quest) => (
+                      <motion.div
+                        key={quest.id}
+                        layout
+                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.85, y: -20, filter: "blur(4px)" }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 35,
+                          mass: 0.8,
+                        }}
+                      >
+                        <QuestCard
+                          quest={quest}
+                          column={col.key}
+                          onToggleTask={handleToggleTask}
+                          onVerify={openVerification}
+                          onEdit={handleEditQuest}
+                          onDelete={(id) => setConfirmDeleteQuestId(id)}
+                          questFeedback={questFeedback[quest.id] || null}
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                  {items.length === 0 && (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="text-xs text-zinc-600 text-center py-6"
+                    >
+                      No quests
+                    </motion.p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Desktop: 3-column grid */}
+      <div className="hidden md:grid md:grid-cols-3 gap-6">
         {COLUMNS.map((col) => {
           const items = columnQuests[col.key];
           return (
@@ -657,6 +723,23 @@ export default function CampaignDetailPage() {
         </DialogContent>
       </Dialog>
       </div>
+
+      <FluidTabs
+        tabs={COLUMNS.map((col) => ({
+          id: col.key,
+          label: col.title,
+          count: columnQuests[col.key].length,
+        }))}
+        activeTab={mobileTab}
+        onChange={setMobileTab}
+        activeColor={
+          mobileTab === "todo"
+            ? "#1cb0f6"
+            : mobileTab === "ongoing"
+            ? "#58cc02"
+            : "#000437"
+        }
+      />
     </div>
   );
 }

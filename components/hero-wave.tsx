@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Show, SignInButton, SignUpButton, UserButton, useAuth } from '@clerk/nextjs';
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion, type Variants } from 'motion/react';
-import { ArrowRight, PlayCircle, ChevronDown, X, Target, Zap, Trophy, Flame, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ChevronDown, X, Target, Zap, Trophy, Flame, ShieldCheck } from 'lucide-react';
 import { syncClerkUserToNeon } from '@/app/actions/sync-user';
 
 export interface HeroWaveNavItem {
@@ -204,13 +204,7 @@ function WaveBackground() {
         className="h-full w-full"
         preserveAspectRatio="none"
       >
-        {/* Layer 1 — faint distant mountain */}
-        <path
-          d="M0 400 C180 520 360 280 540 440 C720 600 900 350 1080 480 C1260 610 1350 420 1440 460 L1440 1080 L0 1080 Z"
-          fill="#58cc02"
-          opacity="0.04"
-        />
-        {/* Layer 2 — soft rolling hill */}
+        {/* Layer 1 — soft rolling hill */}
         <path
           d="M0 500 C240 650 400 380 640 540 C880 700 1040 450 1280 580 C1360 620 1400 520 1440 550 L1440 1080 L0 1080 Z"
           fill="#58cc02"
@@ -455,14 +449,7 @@ export default function HeroWave({
               <ArrowRight className="size-3" />
             </motion.a>
 
-            <Show when="signed-out">
-              <SignInButton mode="modal">
-                <button className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-faded-gray bg-paper-white/80 px-6 text-nav-label font-bold uppercase tracking-[0.0530em] text-spark-blue transition-colors hover:bg-storybook-green/30 backdrop-blur-sm sm:w-auto">
-                  <PlayCircle className="size-4" />
-                  Watch Demo
-                </button>
-              </SignInButton>
-            </Show>
+
           </motion.div>
 
           <motion.div
@@ -476,7 +463,7 @@ export default function HeroWave({
               {LOGOS.map(({ label, Icon }) => (
                 <li
                   key={label}
-                  className="flex items-center gap-2 text-pencil-gray/70 transition-colors hover:text-charcoal"
+                  className="flex items-center gap-2 rounded-lg bg-paper-white/80 px-3 py-1.5 backdrop-blur-sm text-pencil-gray/70 transition-colors hover:text-charcoal"
                 >
                   <Icon className="size-5 shrink-0" />
                   <span className="text-subheading font-bold tracking-tight">
