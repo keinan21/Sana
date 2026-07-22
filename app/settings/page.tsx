@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import GlobalNavbar from "@/components/global-navbar";
@@ -18,7 +18,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-export default function SettingsPage() {
+function SettingsContent() {
   const { user } = useUser();
   const searchParams = useSearchParams();
   const calendarParam = searchParams.get("calendar");
@@ -177,5 +177,13 @@ export default function SettingsPage() {
         </section>
       </main>
     </>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense>
+      <SettingsContent />
+    </Suspense>
   );
 }
