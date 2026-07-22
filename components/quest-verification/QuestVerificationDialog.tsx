@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
 import { Sparkles, CheckCircle } from "lucide-react";
 import { ReflectionVerification } from "./ReflectionVerification";
 import { EssayVerification } from "./EssayVerification";
@@ -55,55 +55,57 @@ export function QuestVerificationDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="bg-white border-2 border-slate-200 text-slate-900 max-w-xl w-full p-6 rounded-xl">
-        <DialogHeader>
-          <DialogTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
+    <Drawer open={open} onOpenChange={handleOpenChange}>
+      <DrawerContent className="sm:max-w-xl mx-auto z-[99999]">
+        <DrawerHeader className="pb-0">
+          <DrawerTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-emerald-600" />
             {questType === "reflection" && "Reflection Quest"}
             {questType === "essay" && "Essay Quest"}
             {questType === "link" && "Link Quest"}
-          </DialogTitle>
-          <DialogDescription className="text-xs text-slate-500">
+          </DrawerTitle>
+          <DrawerDescription className="text-xs text-slate-500">
             {verified
               ? `Quest "${quest.title}" verified successfully!`
               : `${label} for "${quest.title}"`}
-          </DialogDescription>
-        </DialogHeader>
+          </DrawerDescription>
+        </DrawerHeader>
 
-        {verified ? (
-          <div className="flex flex-col items-center justify-center py-6 space-y-3">
-            <CheckCircle className="w-10 h-10 text-emerald-600" />
-            <p className="text-sm font-semibold text-emerald-700">Quest Complete!</p>
-          </div>
-        ) : (
-          <>
-            {questType === "reflection" && (
-              <ReflectionVerification
-                minLength={quest.minReflectionLength}
-                onSubmitReflection={async (text) => onVerifyReflection(quest, text)}
-                onVerified={handleVerified}
-              />
-            )}
-            {questType === "essay" && quest.essayPrompt && (
-              <EssayVerification
-                questTitle={quest.title}
-                essayPrompt={quest.essayPrompt}
-                onSubmitEssay={async (essayText) => onVerifyEssay(quest, essayText)}
-                onVerified={handleVerified}
-              />
-            )}
-            {questType === "link" && (
-              <LinkVerification
-                questTitle={quest.title}
-                linkInstructions={quest.linkInstructions}
-                onSubmitUrl={async (url) => onVerifyLink(quest, url)}
-                onVerified={handleVerified}
-              />
-            )}
-          </>
-        )}
-      </DialogContent>
-    </Dialog>
+        <div className="overflow-y-auto px-4 pb-4">
+          {verified ? (
+            <div className="flex flex-col items-center justify-center py-6 space-y-3">
+              <CheckCircle className="w-10 h-10 text-emerald-600" />
+              <p className="text-sm font-semibold text-emerald-700">Quest Complete!</p>
+            </div>
+          ) : (
+            <>
+              {questType === "reflection" && (
+                <ReflectionVerification
+                  minLength={quest.minReflectionLength}
+                  onSubmitReflection={async (text) => onVerifyReflection(quest, text)}
+                  onVerified={handleVerified}
+                />
+              )}
+              {questType === "essay" && quest.essayPrompt && (
+                <EssayVerification
+                  questTitle={quest.title}
+                  essayPrompt={quest.essayPrompt}
+                  onSubmitEssay={async (essayText) => onVerifyEssay(quest, essayText)}
+                  onVerified={handleVerified}
+                />
+              )}
+              {questType === "link" && (
+                <LinkVerification
+                  questTitle={quest.title}
+                  linkInstructions={quest.linkInstructions}
+                  onSubmitUrl={async (url) => onVerifyLink(quest, url)}
+                  onVerified={handleVerified}
+                />
+              )}
+            </>
+          )}
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 }

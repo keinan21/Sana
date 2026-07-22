@@ -189,10 +189,12 @@ export default function CreateCampaignPage() {
               onClick={() => setUseAi(!useAi)}
               className="w-full flex items-center gap-2 rounded-xl border-2 border-faded-gray bg-muted px-4 py-3 text-left text-sm font-bold text-charcoal hover:bg-[#efefef] transition-colors"
             >
-              {useAi ? <ChevronDown className="h-4 w-4 text-pencil-gray" /> : <ChevronRight className="h-4 w-4 text-pencil-gray" />}
-              <Sparkles className="h-4 w-4 text-[#ff9600]" />
-              Generate initial quests with AI
-              <span className="ml-auto text-[10px] text-pencil-gray font-medium">{useAi ? "on" : "off"}</span>
+              <span className="flex items-center gap-2 min-w-0 flex-1">
+                {useAi ? <ChevronDown className="h-4 w-4 shrink-0 text-pencil-gray" /> : <ChevronRight className="h-4 w-4 shrink-0 text-pencil-gray" />}
+                <Sparkles className="h-4 w-4 shrink-0 text-[#ff9600]" />
+                <span className="truncate">Generate initial quests with AI</span>
+              </span>
+              <span className="shrink-0 text-[10px] text-pencil-gray font-medium">{useAi ? "on" : "off"}</span>
             </button>
 
             {useAi && (
@@ -269,16 +271,7 @@ export default function CreateCampaignPage() {
             )}
 
             <div className="flex items-center gap-3">
-              <Button
-                onClick={handleCreateEmpty}
-                disabled={loading || !isFormValid}
-                className="flex-1 bg-eager-green hover:bg-[#4db802] text-white font-bold py-5 border-2 border-eager-green transition-all disabled:bg-muted disabled:text-pencil-gray disabled:border-faded-gray"
-              >
-                <Target className="h-4 w-4 mr-2" />
-                Create Campaign
-              </Button>
-
-              {useAi && (
+              {useAi ? (
                 <Button
                   onClick={handleGenerateAndCreate}
                   disabled={loading || !isFormValid}
@@ -286,6 +279,15 @@ export default function CreateCampaignPage() {
                 >
                   <Sparkles className="h-4 w-4 mr-2" />
                   {loading && useAi ? "Generating..." : "Generate & Create"}
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleCreateEmpty}
+                  disabled={loading || !isFormValid}
+                  className="flex-1 bg-eager-green hover:bg-[#4db802] text-white font-bold py-5 border-2 border-eager-green transition-all disabled:bg-muted disabled:text-pencil-gray disabled:border-faded-gray"
+                >
+                  <Target className="h-4 w-4 mr-2" />
+                  Create Campaign
                 </Button>
               )}
             </div>

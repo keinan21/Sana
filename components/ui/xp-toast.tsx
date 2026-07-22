@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useSoundEffects } from "@/lib/use-sound-effects"
 
 interface XpToastProps {
   xp: number
@@ -15,6 +16,11 @@ interface XpToastProps {
 
 export function XpToast({ xp, reason, detail, levelName, xpToNext, onDismiss }: XpToastProps) {
   const [visible, setVisible] = useState(false)
+  const { playXpGain } = useSoundEffects()
+
+  useEffect(() => {
+    playXpGain()
+  }, [playXpGain])
 
   useEffect(() => {
     const show = setTimeout(() => setVisible(true), 50)
@@ -28,7 +34,7 @@ export function XpToast({ xp, reason, detail, levelName, xpToNext, onDismiss }: 
   return (
     <div
       className={cn(
-        "fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl border-2 border-emerald-200 bg-white px-5 py-4 shadow-lg transition-all duration-300 max-w-sm",
+        "fixed top-4 right-4 md:bottom-6 md:right-6 md:top-auto z-50 flex items-center gap-3 rounded-xl border-2 border-emerald-200 bg-white px-5 py-4 shadow-lg transition-all duration-300 max-w-sm",
         visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
       )}
     >

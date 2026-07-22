@@ -1,7 +1,7 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { getDashboardData } from "@/app/actions/gamification"
@@ -10,7 +10,7 @@ import { getLevelName } from "@/lib/levels"
 import { PointsAwards } from "@/components/ui/points-awards"
 import { AchievementGrid } from "@/components/ui/achievement-grid"
 import { StreakCard } from "@/components/ui/streak-card"
-import { StreakCalendar } from "@/components/ui/streak-calendar"
+
 import { PointsLevelsTimeline } from "@/components/ui/points-levels-timeline"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
@@ -134,6 +134,23 @@ export default function DashboardPage() {
   const [campaigns, setCampaigns] = useState<DashboardCampaign[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<TabId>("overview")
+  const tabScrollRef = useRef<HTMLDivElement>(null)
+  const [canScrollRight, setCanScrollRight] = useState(false)
+
+  useEffect(() => {
+    const el = tabScrollRef.current
+    if (!el) return
+    const check = () => {
+      setCanScrollRight(el.scrollWidth > el.clientWidth + Math.round(el.scrollLeft))
+    }
+    check()
+    el.addEventListener("scroll", check)
+    window.addEventListener("resize", check)
+    return () => {
+      el.removeEventListener("scroll", check)
+      window.removeEventListener("resize", check)
+    }
+  }, [])
 
   useEffect(() => {
     document.title = "Dashboard | Sana"
@@ -283,23 +300,31 @@ export default function DashboardPage() {
         </div>
 
         {/* TAB BAR */}
-        <div className="flex gap-1 mb-6 border-b-2 border-faded-gray">
-          {TABS.map(({ id, label, Icon }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setActiveTab(id)}
-              className={cn(
-                "inline-flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 -mb-[2px] transition-colors",
-                activeTab === id
-                  ? "text-eager-green border-eager-green"
-                  : "text-pencil-gray border-transparent hover:text-charcoal hover:border-pencil-gray"
-              )}
-            >
-              <Icon className="h-4 w-4" />
-              {label}
-            </button>
-          ))}
+        <div className="relative mb-6">
+          <div
+            ref={tabScrollRef}
+            className="flex gap-1 overflow-x-auto overflow-y-hidden flex-nowrap border-b-2 border-faded-gray scroll-smooth [-webkit-overflow-scrolling:touch]"
+          >
+            {TABS.map(({ id, label, Icon }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setActiveTab(id)}
+                className={cn(
+                  "inline-flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 -mb-[2px] transition-colors shrink-0",
+                  activeTab === id
+                    ? "text-eager-green border-eager-green"
+                    : "text-pencil-gray border-transparent hover:text-charcoal hover:border-pencil-gray"
+                )}
+              >
+                <Icon className="h-4 w-4" />
+                {label}
+              </button>
+            ))}
+          </div>
+          {canScrollRight && (
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-paper-white via-paper-white/60 to-transparent rounded-r-lg" />
+          )}
         </div>
 
         {/* STATS ROW — visible on all tabs */}
@@ -481,80 +506,62 @@ export default function DashboardPage() {
         )}
 
         {activeTab === "progress" && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
             {/* STREAK CARD */}
-            <div className="space-y-6">
-              <StreakCard
-                streak={streakPeriods}
-                currentStreak={data?.streakCount ?? 0}
-                longestStreak={data?.streakCount ?? 0}
-                total={data?.totalXp ?? 0}
-                showHowItWorks={false}
+            <StreakCard
+              streak={streakPeriods}
+              currentStreak={data?.streakCount ?? 0}
+              longestStreak={data?.streakCount ?? 0}
+              total={data?.totalXp ?? 0}
+              showHowItWorks={false}
+            />
+
+            {/* LEVEL TIMELINE */}
+            <div className="rounded-xl border-2 border-faded-gray bg-paper-white p-4 sm:p-5">
+              <h3 className="text-sm font-bold text-charcoal mb-4">Level Journey</h3>
+              <PointsLevelsTimeline
+                levels={levelTimelineData}
+                currentPoints={data?.totalXp}
+                currentLevelLabel={data?.levelName}
               />
             </div>
 
-            {/* WEEKLY CALENDAR */}
-            <div className="space-y-6">
-              <div className="rounded-xl border-2 border-faded-gray bg-paper-white p-4 sm:p-5">
-                <h3 className="text-sm font-bold text-charcoal mb-4">This Week</h3>
-                <StreakCalendar
-                  streak={streakPeriods as never[]}
-                  view="week"
-                  startOfWeek={1}
-                />
-              </div>
-            </div>
-
-            {/* LEVEL TIMELINE — full width */}
-            <div className="lg:col-span-2">
-              <div className="rounded-xl border-2 border-faded-gray bg-paper-white p-4 sm:p-5">
-                <h3 className="text-sm font-bold text-charcoal mb-4">Level Journey</h3>
-                <PointsLevelsTimeline
-                  levels={levelTimelineData}
-                  currentPoints={data?.totalXp}
-                  currentLevelLabel={data?.levelName}
-                />
-              </div>
-            </div>
-
             {/* PROGRESS SUMMARY */}
-            <div className="lg:col-span-2">
-              <div className="rounded-xl border-2 border-faded-gray bg-paper-white p-4 sm:p-5">
-                <h3 className="text-sm font-bold text-charcoal mb-4">Progress Summary</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-xs text-pencil-gray">Tasks</p>
-                    <div className="flex items-end gap-2">
-                      <p className="text-2xl font-bold text-charcoal">{completedTasks}</p>
-                      <p className="text-sm text-pencil-gray mb-0.5">/ {totalTasks}</p>
-                    </div>
-                    <Progress
-                      value={totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0}
-                      className="h-1.5 bg-muted [&>div]:bg-eager-green"
-                    />
+            <div className="rounded-xl border-2 border-faded-gray bg-paper-white p-4 sm:p-5">
+              <h3 className="text-sm font-bold text-charcoal mb-4">Progress Summary</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <p className="text-xs text-pencil-gray">Tasks</p>
+                  <div className="flex items-end gap-2">
+                    <p className="text-2xl font-bold text-charcoal">{completedTasks}</p>
+                    <p className="text-sm text-pencil-gray mb-0.5">/ {totalTasks}</p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-pencil-gray">Quests Verified</p>
-                    <div className="flex items-end gap-2">
-                      <p className="text-2xl font-bold text-charcoal">{verifiedQuests}</p>
-                      <p className="text-sm text-pencil-gray mb-0.5">/ {totalCampaignQuests}</p>
-                    </div>
-                    <Progress
-                      value={totalCampaignQuests > 0 ? (verifiedQuests / totalCampaignQuests) * 100 : 0}
-                      className="h-1.5 bg-muted [&>div]:bg-eager-green"
-                    />
+                  <Progress
+                    value={totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0}
+                    className="h-1.5 bg-muted [&>div]:bg-eager-green"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-pencil-gray">Quests Verified</p>
+                  <div className="flex items-end gap-2">
+                    <p className="text-2xl font-bold text-charcoal">{verifiedQuests}</p>
+                    <p className="text-sm text-pencil-gray mb-0.5">/ {totalCampaignQuests}</p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-pencil-gray">Campaigns</p>
-                    <div className="flex items-end gap-2">
-                      <p className="text-2xl font-bold text-charcoal">{completedCampaigns}</p>
-                      <p className="text-sm text-pencil-gray mb-0.5">/ {campaigns.length}</p>
-                    </div>
-                    <Progress
-                      value={campaigns.length > 0 ? (completedCampaigns / campaigns.length) * 100 : 0}
-                      className="h-1.5 bg-muted [&>div]:bg-eager-green"
-                    />
+                  <Progress
+                    value={totalCampaignQuests > 0 ? (verifiedQuests / totalCampaignQuests) * 100 : 0}
+                    className="h-1.5 bg-muted [&>div]:bg-eager-green"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-pencil-gray">Campaigns</p>
+                  <div className="flex items-end gap-2">
+                    <p className="text-2xl font-bold text-charcoal">{completedCampaigns}</p>
+                    <p className="text-sm text-pencil-gray mb-0.5">/ {campaigns.length}</p>
                   </div>
+                  <Progress
+                    value={campaigns.length > 0 ? (completedCampaigns / campaigns.length) * 100 : 0}
+                    className="h-1.5 bg-muted [&>div]:bg-eager-green"
+                  />
                 </div>
               </div>
             </div>

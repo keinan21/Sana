@@ -277,7 +277,7 @@ export default function HeroWave({
       <FloatingQuestCard />
       <FloatingXpBadge />
 
-      <div className="relative z-30 mx-auto flex min-h-screen w-full max-w-[1200px] flex-col px-5 py-5 sm:px-10 lg:px-[74px]">
+      <div className="relative z-30 mx-auto flex min-h-screen w-full max-w-[1200px] flex-col px-5 py-6 sm:px-10 lg:px-[74px]">
         <motion.header
           variants={headerVariants}
           initial="hidden"
@@ -424,21 +424,21 @@ export default function HeroWave({
 
           <motion.h1
             variants={contentItem}
-            className="mt-4 font-feather text-4xl font-black tracking-[-0.02em] text-balance whitespace-pre-line text-eager-green sm:text-5xl md:text-6xl lg:text-7xl"
+            className="mt-6 sm:mt-4 font-feather text-4xl font-black tracking-[-0.02em] text-balance whitespace-pre-line text-eager-green sm:text-5xl md:text-6xl lg:text-7xl"
           >
             {title}
           </motion.h1>
 
           <motion.p
             variants={contentItem}
-            className="mt-5 max-w-2xl text-body leading-body text-pencil-gray"
+            className="mt-6 sm:mt-5 max-w-2xl text-body leading-body text-pencil-gray"
           >
             {description}
           </motion.p>
 
           <motion.div
             variants={contentItem}
-            className="mt-9 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row"
+            className="mt-10 sm:mt-9 flex w-full flex-col items-center gap-4 sm:gap-3 sm:w-auto sm:flex-row"
           >
             <motion.a
               href={primaryHref}
@@ -454,24 +454,30 @@ export default function HeroWave({
 
           <motion.div
             variants={contentItem}
-            className="mt-16 w-full"
+            className="mt-20 sm:mt-16 w-full overflow-hidden"
           >
-            <p className="text-caption font-bold tracking-wide text-pencil-gray/60 uppercase">
+            <p className="text-caption font-bold tracking-wide text-pencil-gray/60 uppercase text-center">
               What you'll conquer
             </p>
-            <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-8 gap-y-5">
-              {LOGOS.map(({ label, Icon }) => (
-                <li
-                  key={label}
-                  className="flex items-center gap-2 rounded-lg bg-paper-white/80 px-3 py-1.5 backdrop-blur-sm text-pencil-gray/70 transition-colors hover:text-charcoal"
-                >
-                  <Icon className="size-5 shrink-0" />
-                  <span className="text-subheading font-bold tracking-tight">
-                    {label}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <div className="relative mt-6 w-full overflow-hidden">
+              <motion.div
+                className="flex items-center gap-8"
+                animate={{ x: ["0%", "-50%"] }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              >
+                {[...LOGOS, ...LOGOS].map(({ label, Icon }, i) => (
+                  <div
+                    key={`${label}-${i}`}
+                    className="flex shrink-0 items-center gap-2 rounded-lg bg-paper-white/80 px-3 py-1.5 backdrop-blur-sm text-pencil-gray/70"
+                  >
+                    <Icon className="size-5 shrink-0" />
+                    <span className="text-subheading font-bold tracking-tight whitespace-nowrap">
+                      {label}
+                    </span>
+                  </div>
+                ))}
+              </motion.div>
+            </div>
           </motion.div>
         </motion.div>
 
@@ -480,7 +486,7 @@ export default function HeroWave({
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
-          className="pb-6 flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:justify-between"
+          className="pb-8 sm:pb-6 flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:justify-between"
         >
           <motion.div
             variants={contentItem}

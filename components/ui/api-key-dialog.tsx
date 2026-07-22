@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from "react"
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog"
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+} from "@/components/ui/drawer"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -96,21 +96,28 @@ export function ApiKeyDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white border-2 border-slate-200 text-slate-900 max-w-md w-full p-6 shadow-md">
-        <DialogHeader>
-          <DialogTitle className="text-base font-bold text-emerald-700 flex items-center gap-2">
-            <KeyRound className="w-4 h-4" />
-            API & Model Settings
-          </DialogTitle>
-          <DialogDescription className="text-xs text-slate-500">
-            Set your Gemini API key and choose a model. Your settings are stored in your browser's localStorage and never sent to our servers.
-          </DialogDescription>
-        </DialogHeader>
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent className="sm:max-w-xl mx-auto before:border-emerald-200 before:bg-white before:shadow-lg">
+        <DrawerHeader className="pb-0">
+          <div className="flex items-start gap-3 rounded-xl bg-gradient-to-r from-emerald-50 to-emerald-100/50 border border-emerald-200/60 p-4">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
+              <KeyRound className="w-5 h-5" />
+            </div>
+            <div className="min-w-0 flex-1 pt-0.5">
+              <DrawerTitle className="text-base font-bold text-emerald-800 leading-tight">
+                API & Model Settings
+              </DrawerTitle>
+              <DrawerDescription className="text-xs text-emerald-600/70 mt-1 leading-relaxed">
+                Set your Gemini API key and choose a model. Stored locally in your browser.
+              </DrawerDescription>
+            </div>
+          </div>
+        </DrawerHeader>
 
-        <div className="space-y-5 pt-2">
-          <div className="space-y-2">
-            <Label htmlFor="api-key" className="text-xs font-medium text-slate-700">
+        <div className="space-y-5 overflow-y-auto px-4 pt-5 pb-2">
+          <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 space-y-3">
+            <Label htmlFor="api-key" className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <span className="size-1.5 rounded-full bg-emerald-500" />
               Gemini API Key
             </Label>
             <div className="relative">
@@ -120,7 +127,7 @@ export function ApiKeyDialog({
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="AIza..."
-                className="w-full border-2 border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus-visible:border-emerald-400 focus-visible:ring-emerald-400/20 pr-10 text-xs"
+                className="w-full border-2 border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus-visible:border-emerald-400 focus-visible:ring-emerald-400/20 pr-10 text-sm"
               />
               <button
                 type="button"
@@ -132,8 +139,9 @@ export function ApiKeyDialog({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="model-select" className="text-xs font-medium text-slate-700">
+          <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 space-y-3">
+            <Label htmlFor="model-select" className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <span className="size-1.5 rounded-full bg-emerald-500" />
               Gemini Model
             </Label>
             <Select value={selectedModel} onValueChange={(v: ModelId) => setSelectedModel(v)}>
@@ -146,13 +154,13 @@ export function ApiKeyDialog({
               <SelectContent className="border-2 border-slate-200 bg-white">
                 {MODEL_OPTIONS.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value} className="text-slate-900 focus:bg-slate-100">
-                    <span className="font-medium">{opt.label}</span>
-                    <span className="ml-2 text-slate-500 text-[10px]">{opt.description}</span>
+                    <span className="font-medium text-sm">{opt.label}</span>
+                    <span className="ml-2 text-slate-500 text-[11px]">{opt.description}</span>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-[10px] text-slate-400 leading-relaxed">
+            <p className="text-[11px] text-slate-400 leading-relaxed">
               Flash/Lite models are recommended to reduce rate limits and cost.
             </p>
           </div>
@@ -161,9 +169,9 @@ export function ApiKeyDialog({
             href="https://aistudio.google.com/apikey"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-500 underline underline-offset-2"
+            className="inline-flex items-center justify-center gap-2 w-full rounded-xl border-2 border-emerald-200 bg-emerald-50/50 px-4 py-3 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 hover:border-emerald-300 transition-colors"
           >
-            <ExternalLink className="h-3 w-3" />
+            <ExternalLink className="h-4 w-4" />
             Get a free Gemini API key
           </a>
 
@@ -175,26 +183,27 @@ export function ApiKeyDialog({
           )}
         </div>
 
-        <DialogFooter className="gap-2 pt-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleClear}
-            disabled={!inputValue.trim() && !getApiKey()}
-            className="text-slate-500 hover:text-slate-700 text-xs"
-          >
-            Clear
-          </Button>
-          <Button
-            size="sm"
-            onClick={handleSave}
-            disabled={!inputValue.trim()}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs border-2 border-emerald-700"
-          >
-            Save
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <DrawerFooter className="pt-2">
+          <div className="flex gap-3">
+            <Button
+              variant="ghost"
+              onClick={handleClear}
+              disabled={!inputValue.trim() && !getApiKey()}
+              className="flex-1 sm:flex-none text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+            >
+              Clear
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={!inputValue.trim()}
+              className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm border-2 border-emerald-700 py-4 sm:py-2.5"
+            >
+              <Sparkles className="h-4 w-4 mr-1.5" />
+              Save Settings
+            </Button>
+          </div>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   )
 }

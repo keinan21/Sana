@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -105,16 +105,16 @@ export function GenerateQuestsDialog({
   const allAdded = generatedQuests.length > 0 && generatedQuests.every((q) => addedIds.has(q.id));
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="bg-white border-2 border-slate-200 text-slate-900 max-w-xl w-full p-6 rounded-xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
+    <Drawer open={open} onOpenChange={handleOpenChange}>
+      <DrawerContent className="sm:max-w-xl mx-auto z-[99999]">
+        <DrawerHeader className="pb-0">
+          <DrawerTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-emerald-600" />
             Generate Quests with AI
-          </DialogTitle>
-        </DialogHeader>
+          </DrawerTitle>
+        </DrawerHeader>
 
-        <div className="space-y-4">
+        <div className="overflow-y-auto px-4 pb-4 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="gen-prompt" className="text-xs font-medium text-slate-700">
               What kind of quests do you want?
@@ -245,7 +245,7 @@ export function GenerateQuestsDialog({
             </div>
           )}
         </div>
-      </DialogContent>
-    </Dialog>
+      </DrawerContent>
+    </Drawer>
   );
 }

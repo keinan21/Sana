@@ -9,6 +9,7 @@ import {
   type UserAchievement,
 } from "@/components/ui/achievement-badge"
 import { Button } from "@/components/ui/button"
+import { useSoundEffects } from "@/lib/use-sound-effects"
 
 // Types (inlined - only fields used by this component)
 interface Achievement {
@@ -99,6 +100,14 @@ const AchievementUnlocked = React.forwardRef<
         document.body.style.overflow = ""
       }
     }, [open])
+
+    const { playAchievement } = useSoundEffects()
+
+    React.useEffect(() => {
+      if (open) {
+        playAchievement()
+      }
+    }, [open, playAchievement])
 
     if (!open) return null
 

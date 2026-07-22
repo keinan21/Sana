@@ -146,12 +146,16 @@ const PointsLevelsTimeline = React.forwardRef<
 
                   <div className="min-w-0 space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-foreground text-lg font-semibold">
+                      <h3 className="text-foreground text-lg font-semibold truncate">
                         {level.name}
                       </h3>
-                      {isCurrent ? (
-                        <span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-sm font-medium">
-                          {currentLevelLabel}
+                      {isCurrent && currentLevelIndex < levels.length - 1 ? (
+                        <span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-xs sm:text-sm font-medium whitespace-nowrap">
+                          {levels[currentLevelIndex + 1].points - (safeTotalPoints ?? 0)} XP to next level
+                        </span>
+                      ) : isCurrent ? (
+                        <span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-xs sm:text-sm font-medium">
+                          Max Level
                         </span>
                       ) : null}
                     </div>
@@ -189,7 +193,7 @@ const PointsLevelsTimeline = React.forwardRef<
                     ) : null}
                   </div>
 
-                  <p className="text-muted-foreground pt-1 text-lg font-semibold whitespace-nowrap">
+                  <p className="text-muted-foreground pt-1 text-sm sm:text-lg font-semibold sm:whitespace-nowrap">
                     {formatRangeLabel(
                       level.points,
                       index < levels.length - 1

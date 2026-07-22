@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Target } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useSoundEffects } from "@/lib/use-sound-effects"
 
 interface MilestoneToastProps {
   percentage: number
@@ -19,6 +20,11 @@ const MILESTONE_MESSAGES: Record<number, string> = {
 
 export function MilestoneToast({ percentage, levelName, nextLevelName, onDismiss }: MilestoneToastProps) {
   const [visible, setVisible] = useState(false)
+  const { playMilestone } = useSoundEffects()
+
+  useEffect(() => {
+    playMilestone()
+  }, [playMilestone])
 
   useEffect(() => {
     const show = setTimeout(() => setVisible(true), 50)
@@ -34,7 +40,7 @@ export function MilestoneToast({ percentage, levelName, nextLevelName, onDismiss
   return (
     <div
       className={cn(
-        "fixed bottom-24 right-6 z-50 flex items-center gap-3 rounded-xl border-2 border-amber-200 bg-white px-5 py-4 shadow-lg transition-all duration-300 max-w-sm",
+        "fixed top-24 right-4 md:bottom-24 md:right-6 md:top-auto z-50 flex items-center gap-3 rounded-xl border-2 border-amber-200 bg-white px-5 py-4 shadow-lg transition-all duration-300 max-w-sm",
         visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
       )}
     >
